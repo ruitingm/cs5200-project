@@ -9,9 +9,6 @@ def test_db(request):
         count = cursor.fetchone()[0]
 
     return Response({"user_profile_count": count})
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.db import connection
 
 @api_view(['POST'])
 def login(request):

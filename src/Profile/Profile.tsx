@@ -1,40 +1,95 @@
 // TODO:
-// 1. User info dynamically display after connecting to database
-// 2. Make sure user edits write to database
-// 3. Edit cancel button after connecting to database
+// 1. [DONE] User info dynamically display after connecting to database
+// 2. [DONE] Make sure user edits write to database
+// 3. [DONE] Edit cancel button after connecting to database
 // 4. Delete logout button type after connecting to database
 import dayjs from "dayjs";
 import { BellDot } from "lucide-react";
-import { useState } from "react";
-import userData from "../Database/user.json";
+import { useEffect, useState } from "react";
+// import userData from "../Database/user.json";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentUser, updateFirstName, updateLastName } from "./userSlice";
+import { setCurrentUser } from "./userSlice";
+// import { setCurrentUser, updateFirstName, updateLastName } from "./userSlice";
 import { useNavigate } from "react-router";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { fetchProfileApi, updateProfileApi } from "../api/profile";
 
 export default function Profile() {
   dayjs.extend(customParseFormat);
   const { currentUser } = useSelector((state: any) => state.userReducer);
+  const [profileData, setProfileData] = useState<any>(currentUser);
   // Manually add user
-  const [firstName, setFirstName] = useState(
-    currentUser?.firstName || userData[0].firstName
-  );
-  const [lastName, setLastName] = useState(
-    currentUser?.lastName || userData[0].lastName
-  );
+  const [firstName, setFirstName] = useState(currentUser?.firstName || "");
+  const [lastName, setLastName] = useState(currentUser?.lastName || "");
   const profilePicture = "/images/default_profile.jpg";
-  const email = currentUser?.email || userData[0].email;
-  const registerDate = currentUser?.registerDate || userData[0].registerDate;
-  const isStudent = currentUser?.isStudent || userData[0].isStudent;
+  // const email = currentUser?.email || userData[0].email;
+  const email = profileData?.email || currentUser?.email || "";
+  // const registerDate = currentUser?.registerDate || userData[0].registerDate;
+  const registerDate = profileData?.registerDate || currentUser?.registerDate;
+  // const isStudent = currentUser?.isStudent || userData[0].isStudent;
+  const isStudent =
+    profileData?.isStudent ?? currentUser?.isStudent ?? false;
   //
   const today = dayjs().format("dddd, MMMM D, YYYY");
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   console.log("currentUser");
   console.log(currentUser);
   console.log("DATE");
   console.log(registerDate);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!currentUser?.accountNumber) {
+        return;
+      }
+
+      try {
+        const result = await fetchProfileApi(currentUser.accountNumber);
+        setProfileData({
+          ...currentUser,
+          ...result,
+        });
+        setFirstName(result.firstName || "");
+        setLastName(result.lastName || "");
+      } catch (error) {
+        console.log("failed to load profile", error);
+      }
+    };
+
+    loadProfile();
+  }, [currentUser]);
+  const handleSaveProfile = async () => {
+    if (!currentUser?.accountNumber) {
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const updated = await updateProfileApi(currentUser.accountNumber, {
+        firstName,
+        lastName,
+      });
+      setProfileData((prev: any) => ({
+        ...prev,
+        ...updated,
+      }));
+      dispatch(
+        setCurrentUser({
+          ...currentUser,
+          ...updated,
+        })
+      );
+      setIsEditing(false);
+    } catch (error) {
+      console.log("failed to save profile", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div id="profile" className="flex flex-col px-6">
       <header
@@ -86,23 +141,22 @@ export default function Profile() {
               <div className="flex space-x-2">
                 <button
                   id="save-profile-btn"
-                  className="text-lg text-white bg-rose-700 rounded-sm px-5 py-1 hover:bg-rose-800"
-                  onClick={() => {
-                    dispatch(updateFirstName(firstName));
-                    dispatch(updateLastName(lastName));
-                    setIsEditing(false);
-                  }}
+                  className="text-lg text-white bg-rose-700 rounded-sm px-5 py-1 hover:bg-rose-800 disabled:opacity-50"
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
                 >
-                  Save
+                  {isSaving ? "Saving..." : "Save"}
                 </button>
                 <button
                   id="cancel-edit-profile-btn"
                   className="text-lg text-stone-800 bg-neutral-200 rounded-sm px-4 py-1 hover:bg-neutral-300"
                   onClick={() => {
                     setFirstName(
-                      currentUser?.firstName || userData[0].firstName
+                      profileData?.firstName || currentUser?.firstName || ""
                     );
-                    setLastName(currentUser?.lastName || userData[0].lastName);
+                    setLastName(
+                      profileData?.lastName || currentUser?.lastName || ""
+                    );
                     setIsEditing(false);
                   }}
                 >

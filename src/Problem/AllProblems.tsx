@@ -80,6 +80,7 @@ import ProblemItem from "./ProblemItem";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 import { problemCategories } from "./problemType";
+import { fetchTagsApi, fetchTagProblemsApi } from "../api/tags";
 
 export default function AllProblems() {
   const dispatch = useDispatch<AppDispatch>();
@@ -90,37 +91,84 @@ export default function AllProblems() {
     (state: RootState) => state.problemReducer
   );
 
-  // ⭐ Multi-select filters
+  // Multi-select filters
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(
     []
   );
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [topics, setTopics] = useState<
+    { label: string; tagId?: number }[]
+  >(problemCategories.map((label) => ({ label })));
+  const [tagsLoading, setTagsLoading] = useState(true);
+  const [tagsError, setTagsError] = useState<string | null>(null);
+  const [filterMessage, setFilterMessage] = useState("");
+  const [filtering, setFiltering] = useState(false);
 
   // Load problems on page load
   useEffect(() => {
     dispatch(fetchProblems());
+    const loadTags = async () => {
+      try {
+        const result = await fetchTagsApi();
+        const names = result.map(
+          (tag: { concept: string; tag_id: number }) => ({
+            label: tag.concept,
+            tagId: tag.tag_id,
+          })
+        );
+        setTopics(names);
+        setTagsError(null);
+      } catch (error) {
+        console.log("failed to load tags", error);
+        setTagsError("Could not load tags, using defaults.");
+        setTopics(problemCategories.map((label) => ({ label })));
+      } finally {
+        setTagsLoading(false);
+      }
+    };
+    loadTags();
   }, []);
 
   const scrollRight = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  // ⭐ Toggle tag selection
-  const toggleCategory = (tag: string) => {
+  // Toggle tag selection
+  const toggleCategory = async (topic: { label: string; tagId?: number }) => {
+    if (filtering) return;
+
     setSelectedCategories((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(topic.label)
+        ? prev.filter((t) => t !== topic.label)
+        : [...prev, topic.label]
     );
+
+    if (topic.tagId) {
+      setFiltering(true);
+      setFilterMessage(`Loading problems for ${topic.label}...`);
+      try {
+        const result = await fetchTagProblemsApi(topic.tagId);
+        setFilterMessage(`Loaded ${result.length} problems for ${topic.label}.`);
+      } catch (error) {
+        console.log("failed to fetch tag problems", error);
+        setFilterMessage(
+          "Couldn't fetch problems for this tag. Showing local filter."
+        );
+      } finally {
+        setFiltering(false);
+      }
+    }
   };
 
-  // ⭐ Toggle difficulty
+  // Toggle difficulty
   const toggleDifficulty = (level: string) => {
     setSelectedDifficulties((prev) =>
       prev.includes(level) ? prev.filter((d) => d !== level) : [...prev, level]
     );
   };
 
-  // ⭐ Apply ALL filters
+  // Apply ALL filters
   const filteredProblems = problems.filter((p) => {
     const matchCategory =
       selectedCategories.length === 0 ||
@@ -149,18 +197,21 @@ export default function AllProblems() {
           ref={scrollRef}
           className="flex flex-row gap-3 overflow-x-auto no-scrollbar scroll-smooth pr-12 w-[calc(100%-2.5rem)]"
         >
-          {problemCategories.map((topic) => (
+          {(topics.length > 0
+            ? topics
+            : problemCategories.map((label) => ({ label }))
+          ).map((topic) => (
             <button
-              key={topic}
+              key={topic.label}
               onClick={() => toggleCategory(topic)}
               className={`px-4 py-2 rounded-full text-sm font-semibold text-nowrap
                 ${
-                  selectedCategories.includes(topic)
+                  selectedCategories.includes(topic.label)
                     ? "bg-stone-700 text-white"
                     : "bg-gray-300 hover:bg-stone-400 text-stone-800"
                 }`}
             >
-              {topic}
+              {topic.label}
             </button>
           ))}
         </div>
@@ -171,6 +222,16 @@ export default function AllProblems() {
           <ChevronRight size={20} />
         </button>
       </div>
+
+      {tagsLoading && (
+        <div className="text-sm text-slate-500">Loading tags…</div>
+      )}
+      {!tagsLoading && tagsError && (
+        <div className="text-sm text-rose-600">{tagsError}</div>
+      )}
+      {filterMessage && (
+        <div className="text-sm text-slate-600">{filterMessage}</div>
+      )}
 
       {/* ===================== DIFFICULTY FILTER ===================== */}
       <div className="flex gap-3">

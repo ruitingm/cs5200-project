@@ -45,3 +45,73 @@ def login(request):
         "isStudent": profile[3],
         "isAdmin": profile[4],
     })
+
+@api_view(['GET'])
+def get_profile(request, account_number):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                p.Email,
+                p.First_name,
+                p.Last_name,
+                a.Register_date,
+                a.Student_flag,
+                a.Admin_flag
+            FROM USER_PROFILE p
+            JOIN ACCOUNT a ON p.Email = a.Email
+            WHERE a.Account_number = %s
+        """, [account_number])
+        profile = cursor.fetchone()
+
+    if not profile:
+        return Response({"success": False, "message": "Profile not found"}, status=404)
+
+    return Response({
+        "email": profile[0],
+        "firstName": profile[1],
+        "lastName": profile[2],
+        "registerDate": profile[3],
+        "isStudent": profile[4],
+        "isAdmin": profile[5],
+    })
+
+@api_view(['POST'])
+def update_profile(request, account_number):
+    first_name = request.data.get("firstName")
+    last_name = request.data.get("lastName")
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            UPDATE USER_PROFILE
+            SET First_name = %s, Last_name = %s
+            WHERE Email = (
+                SELECT Email FROM ACCOUNT WHERE Account_number = %s
+            )
+        """, [first_name, last_name, account_number])
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                p.Email,
+                p.First_name,
+                p.Last_name,
+                a.Register_date,
+                a.Student_flag,
+                a.Admin_flag
+            FROM USER_PROFILE p
+            JOIN ACCOUNT a ON p.Email = a.Email
+            WHERE a.Account_number = %s
+        """, [account_number])
+        profile = cursor.fetchone()
+
+    if not profile:
+        return Response({"success": False, "message": "Profile not found"}, status=404)
+
+    return Response({
+        "email": profile[0],
+        "firstName": profile[1],
+        "lastName": profile[2],
+        "registerDate": profile[3],
+        "isStudent": profile[4],
+        "isAdmin": profile[5],
+    })

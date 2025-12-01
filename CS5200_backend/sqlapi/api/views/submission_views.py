@@ -8,10 +8,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db import connection
 
-from django.db import connection
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-
 @api_view(["GET"])
 def list_submissions(request, account_number):
     with connection.cursor() as cursor:

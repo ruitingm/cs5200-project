@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router";
 import type { RootState } from "../store/store";
+import { submitProblemApi } from "../api/submissions";
 
 export default function ProblemEdit() {
   const { pId } = useParams();
@@ -16,17 +17,45 @@ export default function ProblemEdit() {
     (state: RootState) => state.solutionReducer.solutions
   );
   const solution = solutions?.find((s) => problem?.pSolutionId === s.sId);
+  const currentUser = useSelector(
+    (state: RootState) => state.userReducer.currentUser
+  );
   console.log(solution);
   const [submitted, setSubmitted] = useState(false);
   const [passed, setPassed] = useState(false);
   const [solutionVisible, setSolutionVisible] = useState(false);
   const [code, setCode] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    const success = Math.random() > 0.5;
-    setPassed(success);
-    setSolutionVisible(true);
+  const handleSubmit = async () => {
+    if (!currentUser?.accountNumber || !pId) {
+      console.log("Missing account number or problem id");
+      return;
+    }
+
+    if (!code.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await submitProblemApi(Number(pId), {
+        accountNumber: currentUser.accountNumber,
+        submission: code,
+      });
+
+      setSubmitted(true);
+      setPassed(true);
+      setSolutionVisible(true);
+    } catch (error) {
+      console.log("Failed to submit problem", error);
+      setSubmitError("Failed to submit answer. Try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,7 +77,12 @@ export default function ProblemEdit() {
             {problem?.pDescription}
           </pre>
         </div>
-        {submitted && (
+        {submitError && (
+          <div className="p-3 rounded-lg font-medium mb-4 bg-rose-100 text-rose-800 border border-rose-300">
+            {submitError}
+          </div>
+        )}
+        {submitted && !submitError && (
           <div
             className={`p-3 rounded-lg font-medium mb-4 ${
               passed
@@ -96,9 +130,10 @@ export default function ProblemEdit() {
         <div className="sticky bottom-0 bg-stone-200 py-3 flex justify-end mb-1">
           <button
             onClick={handleSubmit}
-            className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-sm"
+            className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50"
+            disabled={isSubmitting}
           >
-            Submit
+            {isSubmitting ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>
