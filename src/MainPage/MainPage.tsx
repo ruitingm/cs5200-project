@@ -11,15 +11,29 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 
 export default function MainPage() {
+  // const currentUser = useSelector(
+  //   (state: RootState) => state.userReducer.currentUser
+  // );
   const currentUser = useSelector(
     (state: RootState) => state.userReducer.currentUser
   );
+
+  if (!currentUser) return <Navigate to="/" replace />;
+
   return (
     <div className="grid h-screen grid-cols-1 md:grid-cols-[5rem_1fr] gap-4 p-2 overflow-hidden">
       <div className="hidden md:block">
         <NavigationBar />
       </div>
-      <div className="bg-stone-100 rounded-xl m-2 flex flex-col min-h-0 overflow-hidden">
+      {/* <div className="bg-stone-100 rounded-xl m-2 flex flex-col min-h-0 overflow-hidden"> */}
+      <div className="bg-stone-100 rounded-xl m-2 p-4">
+        {/* 🔥 登录后欢迎信息 */}
+        <h1 className="text-2xl font-bold mb-2">
+          Welcome, {currentUser.firstName} {currentUser.lastName}!
+        </h1>
+        <p className="text-slate-500 text-sm mb-6">
+          Role: {currentUser.isAdmin ? "Admin" : "Student"}
+        </p>
         <Routes>
           <Route path="/" element={<Navigate to="allproblems" />} />
           <Route path="settings" element={<Setting />} />
@@ -28,7 +42,10 @@ export default function MainPage() {
           <Route path="allproblems" element={<AllProblems />} />
           <Route path="chat/*" element={<AIChat />} />
           <Route path="problems/:pId" element={<ProblemEdit />} />
-          {currentUser?.isAdmin && (
+          {/* {currentUser?.isAdmin && (
+            <Route path="admin-control/*" element={<AdminControl />} />
+          )} */}
+          {currentUser.isAdmin && (
             <Route path="admin-control/*" element={<AdminControl />} />
           )}
         </Routes>

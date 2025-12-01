@@ -1,0 +1,19 @@
+# [START django_app]
+runtime: python311
+
+entrypoint: gunicorn -b :$PORT sqlapi.wsgi:application
+
+instance_class: F2
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: "sqlapi.settings"
+  SECRET_KEY: "some-secret-key"
+  DEBUG: "false"
+
+handlers:
+  - url: /static
+    static_dir: static/
+
+  - url: /.*
+    script: auto
+# [END django_app]

@@ -1,10 +1,16 @@
 export type User = {
-  userId: number;
+  // userId: number;
+  // email: string;
+  // firstName: string;
+  // lastName: string;
+  // isAdmin: boolean;
+  // isStudent: boolean;
+  // registerDate: string;
+  // password: string;
   email: string;
   firstName: string;
   lastName: string;
-  isAdmin: boolean;
-  isStudent: boolean;
-  registerDate: string;
-  // password: string;
+  accountNumber: number;
+  isStudent: boolean; // true/false
+  isAdmin: boolean; // true/false
 };

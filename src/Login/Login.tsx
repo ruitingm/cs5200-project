@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router";
 import { setCurrentUser } from "../Profile/userSlice";
 import { MockLogin } from "./MockLogin";
 import { useState } from "react";
+import { loginApi } from "../api/auth";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -15,21 +16,54 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleLogin = (email: string, password: string) => {
-    const result = MockLogin(email, password);
-    if (!result.success) {
-      setError(result.message || null);
-      return;
-    }
-    if (result.user) {
+  const [loading, setLoading] = useState(false);
+  // const handleLogin = (email: string, password: string) => {
+  //   const result = MockLogin(email, password);
+  //   if (!result.success) {
+  //     setError(result.message || null);
+  //     return;
+  //   }
+  //   if (result.user) {
+  //     dispatch(
+  //       setCurrentUser({
+  //         ...result.user,
+  //       })
+  //     );
+  //     navigate("/main");
+  //   }
+  // };
+  const handleLogin = async () => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = await loginApi(email, password);
+
+      if (!result.success) {
+        setError(result.message || "Login failed");
+        return;
+      }
+
+      // ✅ 把 Django / loginApi 返回的数据映射到 Redux 的 User 类型
       dispatch(
         setCurrentUser({
-          ...result.user,
+          email: result.email,
+          firstName: result.firstName, // 确保 loginApi 已经转成 camelCase
+          lastName: result.lastName,
+          accountNumber: result.accountNumber,
+          isStudent: result.isStudent, // boolean
+          isAdmin: result.isAdmin, // boolean
         })
       );
+
       navigate("/main");
+    } catch (err) {
+      setError("Server error. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <div id="login" className="flex justify-center items-center">
       <div
@@ -72,7 +106,7 @@ export default function Login() {
           {error && (
             <div className="text-rose-700 flex mx-2 text-sm">{error}</div>
           )}
-          <button
+          {/* <button
             className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
@@ -80,6 +114,16 @@ export default function Login() {
             }}
           >
             Log in
+          </button> */}
+          <button
+            className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogin(); // ✅ 不再传 email / password
+            }}
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Log in"}
           </button>
           <div className="text-sm text-center">
             Do not have an account? &nbsp;
