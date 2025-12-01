@@ -41,10 +41,15 @@ export default function NavigationBar() {
             className="hover:cursor-pointer"
           />
         </Link>
+        {/* {navLinks
+          .filter((link) => !link.adminOnly || currentUser?.isAdmin)
+          .map((link) => {
+            const isActive = pathname.includes(link.label); */}
         {navLinks
           .filter((link) => !link.adminOnly || currentUser?.isAdmin)
           .map((link) => {
-            const isActive = pathname.includes(link.label);
+            const isActive = pathname.startsWith(link.path);
+
             return (
               <Link
                 key={link.label}
@@ -63,6 +68,19 @@ export default function NavigationBar() {
             );
           })}
       </nav>
+      {/* User Info */}
+      <div className="mb-4 text-center text-xs text-stone-700">
+        {currentUser && (
+          <>
+            <div>
+              {currentUser.firstName} {currentUser.lastName}
+            </div>
+            <div className="text-stone-500 text-[10px]">
+              {currentUser.isAdmin ? "Admin" : "Student"}
+            </div>
+          </>
+        )}
+      </div>
     </aside>
   );
 }

@@ -1,37 +1,164 @@
-import { useRef } from "react";
+// import { useRef } from "react";
+// import { ChevronRight } from "lucide-react";
+// import { Link } from "react-router";
+// import ProblemItem from "./ProblemItem";
+// import { useSelector } from "react-redux";
+// import { problemCategories } from "./problemType";
+// import type { RootState } from "../store/store";
+
+// export default function AllProblems() {
+//   const scrollRef = useRef<HTMLDivElement>(null);
+//   const problems = useSelector(
+//     (state: RootState) => state.problemReducer.problems
+//   );
+//   const scrollRight = () => {
+//     if (scrollRef.current) {
+//       scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col h-full w-full bg-stone-100 text-stone-900 rounded-xl p-4 overflow-hidden space-y-5">
+//       <div className="relative flex items-center mb-8">
+//         <div
+//           ref={scrollRef}
+//           className="flex flex-row gap-3 overflow-x-auto no-scrollbar scroll-smooth pr-12 w-[calc(100%-2.5rem)]"
+//         >
+//           {problemCategories.map((topic, index) => (
+//             <button
+//               key={index}
+//               className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors text-nowrap ${
+//                 topic === "Basic"
+//                   ? "bg-stone-600 text-white"
+//                   : "bg-gray-300 hover:bg-stone-400 text-stone-800"
+//               }`}
+//             >
+//               {topic}
+//             </button>
+//           ))}
+//         </div>
+//         <button
+//           onClick={scrollRight}
+//           className="absolute right-0 bg-stone-200 hover:bg-stone-300 p-1 rounded-full shadow-sm"
+//         >
+//           <ChevronRight className="text-stone-700" size={20} />
+//         </button>
+//       </div>
+//       <div className="flex items-center justify-between">
+//         <div className="flex items-center gap-2 bg-stone-200 px-3 py-1 rounded-3xl w-1/2">
+//           <input
+//             type="text"
+//             placeholder="Search questions..."
+//             className="bg-transparent w-full focus:outline-none text-stone-700 placeholder-stone-700"
+//           />
+//           <Link to="/main/chat">
+//             <button className="py-2 px-3 rounded-3xl border border-sky-500 bg-stone-300 text-sm font-semibold text-stone-700 text-nowrap hover:bg-sky-700 hover:text-stone-50 shadow-md">
+//               Ask AI for New Questions
+//             </button>
+//           </Link>
+//         </div>
+//       </div>
+//       <div className="flex-1 overflow-y-auto rounded-lg ">
+//         {problems?.map((p: any) => (
+//           <div key={p.pId}>
+//             <ProblemItem
+//               pId={p.pId}
+//               pTitle={p.pTitle}
+//               difficultyTag={p.difficultyTag}
+//             />
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProblems } from "./problemSlice";
+import type { AppDispatch, RootState } from "../store/store";
+import ProblemItem from "./ProblemItem";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
-import ProblemItem from "./ProblemItem";
-import { useSelector } from "react-redux";
 import { problemCategories } from "./problemType";
-import type { RootState } from "../store/store";
 
 export default function AllProblems() {
+  const dispatch = useDispatch<AppDispatch>();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const problems = useSelector(
-    (state: RootState) => state.problemReducer.problems
+
+  // Redux data
+  const { problems, loading, error } = useSelector(
+    (state: RootState) => state.problemReducer
   );
+
+  // ⭐ Multi-select filters
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(
+    []
+  );
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // Load problems on page load
+  useEffect(() => {
+    dispatch(fetchProblems());
+  }, []);
+
   const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
-    }
+    scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
+  // ⭐ Toggle tag selection
+  const toggleCategory = (tag: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  // ⭐ Toggle difficulty
+  const toggleDifficulty = (level: string) => {
+    setSelectedDifficulties((prev) =>
+      prev.includes(level) ? prev.filter((d) => d !== level) : [...prev, level]
+    );
+  };
+
+  // ⭐ Apply ALL filters
+  const filteredProblems = problems.filter((p) => {
+    const matchCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.some((tag) => p.conceptTag.includes(tag));
+
+    const matchDifficulty =
+      selectedDifficulties.length === 0 ||
+      selectedDifficulties.includes(p.difficultyTag);
+
+    const matchSearch =
+      searchKeyword === "" ||
+      p.pTitle.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      p.pDescription.toLowerCase().includes(searchKeyword.toLowerCase());
+
+    return matchCategory && matchDifficulty && matchSearch;
+  });
+
+  if (loading) return <div className="p-4">Loading problems…</div>;
+  if (error) return <div className="p-4 text-red-500">{error}</div>;
+
   return (
-    <div className="flex flex-col h-full w-full bg-stone-100 text-stone-900 rounded-xl p-4 overflow-hidden space-y-5">
-      <div className="relative flex items-center mb-8">
+    <div className="flex flex-col h-full w-full bg-stone-100 p-4 space-y-5">
+      {/* ===================== CATEGORY FILTER ===================== */}
+      <div className="relative flex items-center mb-4">
         <div
           ref={scrollRef}
           className="flex flex-row gap-3 overflow-x-auto no-scrollbar scroll-smooth pr-12 w-[calc(100%-2.5rem)]"
         >
-          {problemCategories.map((topic, index) => (
+          {problemCategories.map((topic) => (
             <button
-              key={index}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors text-nowrap ${
-                topic === "Basic"
-                  ? "bg-stone-600 text-white"
-                  : "bg-gray-300 hover:bg-stone-400 text-stone-800"
-              }`}
+              key={topic}
+              onClick={() => toggleCategory(topic)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold text-nowrap
+                ${
+                  selectedCategories.includes(topic)
+                    ? "bg-stone-700 text-white"
+                    : "bg-gray-300 hover:bg-stone-400 text-stone-800"
+                }`}
             >
               {topic}
             </button>
@@ -41,33 +168,61 @@ export default function AllProblems() {
           onClick={scrollRight}
           className="absolute right-0 bg-stone-200 hover:bg-stone-300 p-1 rounded-full shadow-sm"
         >
-          <ChevronRight className="text-stone-700" size={20} />
+          <ChevronRight size={20} />
         </button>
       </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 bg-stone-200 px-3 py-1 rounded-3xl w-1/2">
-          <input
-            type="text"
-            placeholder="Search questions..."
-            className="bg-transparent w-full focus:outline-none text-stone-700 placeholder-stone-700"
-          />
-          <Link to="/main/chat">
-            <button className="py-2 px-3 rounded-3xl border border-sky-500 bg-stone-300 text-sm font-semibold text-stone-700 text-nowrap hover:bg-sky-700 hover:text-stone-50 shadow-md">
-              Ask AI for New Questions
-            </button>
-          </Link>
-        </div>
+
+      {/* ===================== DIFFICULTY FILTER ===================== */}
+      <div className="flex gap-3">
+        {["Easy", "Medium", "Hard"].map((diff) => (
+          <button
+            key={diff}
+            onClick={() => toggleDifficulty(diff)}
+            className={`px-4 py-1 rounded-full text-sm font-semibold
+              ${
+                selectedDifficulties.includes(diff)
+                  ? "bg-sky-600 text-white"
+                  : "bg-gray-300 text-stone-800 hover:bg-sky-300"
+              }`}
+          >
+            {diff}
+          </button>
+        ))}
       </div>
-      <div className="flex-1 overflow-y-auto rounded-lg ">
-        {problems?.map((p: any) => (
-          <div key={p.pId}>
+
+      {/* ===================== SEARCH FILTER ===================== */}
+      <div className="flex gap-2 bg-white px-3 py-1 rounded-3xl shadow">
+        <input
+          type="text"
+          placeholder="Search problems..."
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="bg-transparent w-full focus:outline-none text-stone-700"
+        />
+
+        <Link to="/main/chat">
+          <button className="py-2 px-3 rounded-3xl border border-sky-500 bg-stone-200 text-sm font-semibold hover:bg-sky-700 hover:text-white shadow-md">
+            Ask AI
+          </button>
+        </Link>
+      </div>
+
+      {/* ===================== PROBLEM LIST ===================== */}
+      <div className="flex-1 overflow-y-auto rounded-lg">
+        {filteredProblems.length === 0 ? (
+          <div className="p-6 text-stone-500 text-center">
+            No problems match your filters.
+          </div>
+        ) : (
+          filteredProblems.map((p) => (
             <ProblemItem
+              key={p.pId}
               pId={p.pId}
               pTitle={p.pTitle}
               difficultyTag={p.difficultyTag}
             />
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
