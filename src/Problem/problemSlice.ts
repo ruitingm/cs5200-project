@@ -1,3 +1,10 @@
+/**
+ * - Defines Redux state slice for “problems” (list of SQL problems)  
+ * - Manages problem list, loading status, and errors  
+ * - Supports async fetching of problems from backend via fetchProblems thunk  
+ * - Also provides reducers to set/add/delete/update problems (for client-side or admin actions)  
+ */
+
 import {
   createSlice,
   createAsyncThunk,
@@ -17,11 +24,12 @@ const initialState: problemState = {
   loading: false,
   error: null,
 };
+
 export const fetchProblems = createAsyncThunk(
   "problem/fetchProblems",
   async () => {
     const problems = await fetchProblemsApi();
-    return problems; // 返回后端 JSON 数组
+    return problems;
   }
 );
 const problemSlice = createSlice({

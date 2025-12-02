@@ -1,3 +1,8 @@
+/**
+ * - fetchProfileApi(accountNumber): GET request to backend to retrieve user profile data  
+ * - updateProfileApi(accountNumber, data): POST request to update user’s first and last name  
+ */
+
 const BASE_URL = "https://sql-study-room-2025.uw.r.appspot.com";
 
 export async function fetchProfileApi(accountNumber: number) {

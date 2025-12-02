@@ -1,3 +1,14 @@
+/**
+ * Lets admin edit an existing SQL problem
+ * - Loads the problem from Redux store by pId
+ * - Uses local state (useState) for form fields
+ * - On “Save” click, dispatches updates to store and returns to the list view
+ * 
+ * TODO:
+ * Need to connect to bakcend, right now only updates Redux store.
+ * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
+ */
+
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";

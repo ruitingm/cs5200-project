@@ -1,3 +1,14 @@
+/**
+ * Shows a list of problems filtered by review status All/Reviewed/Unreviewed
+ * - Lets admin view, edit, or delete each problem
+ * - Uses Redux store via useSelector to get current list of problems
+ * - Includes DeleteModal to confirm deletions
+ * - Calls onCreate or onEdit to trigger creation or edit
+ * 
+ * TODO:
+ * Backend integration
+ */
+
 import { useState } from "react";
 import { Eye, PencilLine, Trash2 } from "lucide-react";
 import type { problemFilter } from "../Problem/problemType";
@@ -23,6 +34,7 @@ export default function ProblemPanel({
   });
   const filterOptions: problemFilter[] = ["All", "Reviewed", "Unreviewed"];
   const [openModal, setOpenModal] = useState(false);
+  
   return (
     <div className="flex flex-col flex-1 bg-stone-50 border border-stone-200 rounded-xl p-4 shadow-sm min-h-0">
       <div className="flex gap-3 mb-4">

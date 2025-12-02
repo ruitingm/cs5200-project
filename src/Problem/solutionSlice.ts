@@ -1,3 +1,13 @@
+/**
+ * - Defines Redux state slice for storing “solutions” in the app  
+ * - Manages list of solutions (solution ID + description) in frontend state  
+ * - Provides actions to set the whole list, add/delete/update a solution  
+ * 
+ * TODO:
+ * Just like you fetch problems via an async thunk, you may want to fetch solutions from backend. 
+ * Right now this slice assumes solutions are provided manually (via setSolutions or addSolution).
+ */
+
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Solution } from "./solutionType";
 

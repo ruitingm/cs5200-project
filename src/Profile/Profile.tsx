@@ -1,8 +1,13 @@
-// TODO:
-// 1. [DONE] User info dynamically display after connecting to database
-// 2. [DONE] Make sure user edits write to database
-// 3. [DONE] Edit cancel button after connecting to database
-// 4. Delete logout button type after connecting to database
+/**
+ * Displays the logged-in user’s profile info
+ * - Fetches full profile data from backend on mount  
+ * - Allows user to edit first and last name and save changes via backend API  
+ * - Provides a logout button to clear user state and navigate to login page  
+ * 
+ * TODO:
+ * Validate user input before saving profile
+ */
+
 import dayjs from "dayjs";
 import { BellDot } from "lucide-react";
 import { useEffect, useState } from "react";

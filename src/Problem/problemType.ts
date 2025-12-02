@@ -1,3 +1,8 @@
+/**
+ * - Defines types and constant lists for problems in the app 
+ * - Defines problemFilter type used for filtering UI
+ */
+
 export const problemDifficulties = ["Easy", "Medium", "Hard"] as const;
 export type ProblemDifficultyTag = (typeof problemDifficulties)[number];
 

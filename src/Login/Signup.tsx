@@ -1,13 +1,19 @@
-// TODO:
-// 1. Check user input values
-// 2. Set error messge for invalid user input
-// 3. Set visible password when click on eye button
+/**
+ * UI for users to sign up (first name, last name, email, password)  
+ * - On “Sign up” click, stores user data in Redux and navigates to main page (currently mock flow)  
+ * 
+ * TODO: 
+ * Need backend signup API call
+ * Check user input values, set error messge for invalid inputs
+ */
+
 import { EyeOff } from "lucide-react";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "../Profile/userSlice";
+
 export default function Signup() {
   const [user, setUser] = useState<any>({});
   const dispatch = useDispatch();
@@ -23,6 +29,7 @@ export default function Signup() {
     dispatch(setCurrentUser(user));
     navigate("/main");
   };
+
   return (
     <div id="signup" className="flex justify-center items-center">
       <div

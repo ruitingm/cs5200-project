@@ -1,3 +1,9 @@
+/**
+ * Redux store setup for SQL Study Room
+ * - Combines all Redux slices into one central store
+ * - Allows components to access shared data and dispatch actions with Redux
+ */
+
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "../Profile/userSlice";
 import problemReducer from "../Problem/problemSlice";

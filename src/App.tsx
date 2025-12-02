@@ -1,3 +1,15 @@
+/**
+ * Root component for SQL Study Room frontend
+ * - Sets up different pages of the website with React Router
+ * - Loads all SQL problems from backend as soon as app opens
+ * - Handles loading/error screens
+ * - Defines the main routes (pages) and direct users to them
+ *    > "/" automatically sends the user to the signup page
+ *    > "/signup" the page where users create an account
+ *    > "/login"  the page where users log in
+ *    > "/main/*" the main part of the app
+ */
+
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./Login/Login";
