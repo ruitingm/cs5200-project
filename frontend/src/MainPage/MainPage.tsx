@@ -1,9 +1,9 @@
 /**
- * Main layout and router after user login  
- * - Shows navigation bar + main content area  
- * - Checks if user is logged in; if not, redirects to login/signup  
- * - Defines routes for various pages 
- * - Displays a welcome message including user’s name and role  
+ * Main layout and router after user login
+ * - Shows navigation bar + main content area
+ * - Checks if user is logged in; if not, redirects to login/signup
+ * - Defines routes for various pages
+ * - Displays a welcome message including user’s name and role
  */
 
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -19,9 +19,6 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 
 export default function MainPage() {
-  // const currentUser = useSelector(
-  //   (state: RootState) => state.userReducer.currentUser
-  // );
   const currentUser = useSelector(
     (state: RootState) => state.userReducer.currentUser
   );
@@ -33,14 +30,13 @@ export default function MainPage() {
       <div className="hidden md:block">
         <NavigationBar />
       </div>
-      {/* <div className="bg-stone-100 rounded-xl m-2 flex flex-col min-h-0 overflow-hidden"> */}
-      <div className="bg-stone-100 rounded-xl m-2 p-4">
-        <h1 className="text-2xl font-bold mb-2">
+      <div className="bg-stone-100 rounded-xl m-2 flex flex-col min-h-0 overflow-hidden">
+        {/* <h1 className="text-2xl font-bold mb-2">
           Welcome, {currentUser.firstName} {currentUser.lastName}!
         </h1>
         <p className="text-slate-500 text-sm mb-6">
           Role: {currentUser.isAdmin ? "Admin" : "Student"}
-        </p>
+        </p> */}
         <Routes>
           <Route path="/" element={<Navigate to="allproblems" />} />
           <Route path="settings" element={<Setting />} />
@@ -49,9 +45,7 @@ export default function MainPage() {
           <Route path="allproblems" element={<AllProblems />} />
           <Route path="chat/*" element={<AIChat />} />
           <Route path="problems/:pId" element={<ProblemEdit />} />
-          {/* {currentUser?.isAdmin && (
-            <Route path="admin-control/*" element={<AdminControl />} />
-          )} */}
+          <Route path="admin-control/*" element={<AdminControl />} />
           {currentUser.isAdmin && (
             <Route path="admin-control/*" element={<AdminControl />} />
           )}
