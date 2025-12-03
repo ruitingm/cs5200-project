@@ -76,19 +76,19 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-     'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sql_study_room',
-        'USER': 'BeautySharon',
-        'PASSWORD': 'StrongPwd__123!',
-        'HOST': '34.168.79.184',
-        'PORT': '3306',
-        'OPTIONS': {
-            'connect_timeout': 5,  # 👈 让连不上时尽快报错，而不是卡很久
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#      'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'sql_study_room',
+#         'USER': 'BeautySharon',
+#         'PASSWORD': 'StrongPwd__123!',
+#         'HOST': '34.168.79.184',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'connect_timeout': 5,  # 👈 让连不上时尽快报错，而不是卡很久
+#         },
+#     }
+# }
 
 # DATABASES = {
 #     'default': {
@@ -100,6 +100,18 @@ DATABASES = {
 #         'PORT': '3306'
 #     }
 # }
+
+DATABASES = {
+    "default": {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "sql_study_room",
+        'USER': "ruitingm",
+        "PASSWORD": "123A456b789c.",
+        'HOST': "127.0.0.1",
+        'PORT': '3306'
+    }
+}
+
 
 
 # Password validation
