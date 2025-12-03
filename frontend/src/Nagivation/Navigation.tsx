@@ -1,14 +1,13 @@
 /**
- * Sidebar navigation menu 
- * - Shows different links (Problems, Chat, Reports, Profile, Settings)  
- * - Admin link visible only to admin users  
- * - Displays current user name and role at bottom of sidebar  
+ * Sidebar navigation menu
+ * - Shows different links (Problems, Chat, Reports, Profile, Settings)
+ * - Admin link visible only to admin users
+ * - Displays current user name and role at bottom of sidebar
  */
 
 import {
   ScrollText,
   MessageCircleMore,
-  Settings,
   User,
   ChartColumnIncreasing,
   SlidersHorizontal,
@@ -34,7 +33,6 @@ export default function NavigationBar() {
       icon: SlidersHorizontal,
       adminOnly: true,
     },
-    { label: "settings", path: "/main/settings", icon: Settings },
   ];
 
   return (

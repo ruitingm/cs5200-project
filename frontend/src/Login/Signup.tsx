@@ -1,15 +1,13 @@
 /**
- * UI for users to sign up (first name, last name, email, password)  
- * - On “Sign up” click, stores user data in Redux and navigates to main page (currently mock flow)  
- * 
- * TODO: 
+ * UI for users to sign up (first name, last name, email, password)
+ * - On “Sign up” click, stores user data in Redux and navigates to main page (currently mock flow)
+ *
+ * TODO:
  * Need backend signup API call
  * Check user input values, set error messge for invalid inputs
  */
 
-import { EyeOff } from "lucide-react";
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "../Profile/userSlice";
@@ -95,10 +93,6 @@ export default function Signup() {
               className="w-full rounded border border-stone-300 ps-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-stone-100 text-stone-700"
               onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
-            <EyeOff
-              size={18}
-              className="absolute text-stone-400 cursor-pointer right-3 top-8"
-            />
           </div>
           {error && (
             <div className="text-rose-700 flex mx-2 text-sm">{error}</div>
@@ -115,20 +109,6 @@ export default function Signup() {
               Log in
             </Link>
           </div>
-          <div className="relative flex items-center">
-            <div className="grow border-t border-stone-400"></div>
-            <span className="shrink mx-4 text-stone-400">or</span>
-            <div className="grow border-t border-stone-400"></div>
-          </div>
-          <button
-            className="w-full py-2 rounded mt-2 hover:bg-stone-100 font-bold border justify-center border-stone-500
-          "
-          >
-            <div className="flex justify-center">
-              <FcGoogle size={22} />
-              <span className="ms-2 text-stone-600">Sign up with Google</span>
-            </div>
-          </button>
         </form>
       </div>
     </div>

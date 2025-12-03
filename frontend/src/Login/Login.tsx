@@ -1,18 +1,16 @@
 /**
- * UI for users to log in with email & password  
- * - Calls backend via loginApi and, if successful stores user info in Redux  
- * - Redirects user to main page on successful login; shows error messages on failure  
- * 
+ * UI for users to log in with email & password
+ * - Calls backend via loginApi and, if successful stores user info in Redux
+ * - Redirects user to main page on successful login; shows error messages on failure
+ *
  * TODO:
  * Connect to backend databae for login credential check
  */
 
-import { EyeOff } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { setCurrentUser } from "../Profile/userSlice";
-import { MockLogin } from "./MockLogin";
+// import { MockLogin } from "./MockLogin";
 import { useState } from "react";
 import { loginApi } from "../api/auth";
 
@@ -103,10 +101,6 @@ export default function Login() {
               className="w-full rounded border border-stone-300 ps-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-stone-200"
               onChange={(e) => setPassword(e.target.value)}
             />
-            <EyeOff
-              size={18}
-              className="absolute text-stone-400 cursor-pointer right-3 top-8"
-            />
           </div>
           {error && (
             <div className="text-rose-700 flex mx-2 text-sm">{error}</div>
@@ -136,20 +130,6 @@ export default function Login() {
               Sign up here
             </Link>
           </div>
-          <div className="relative flex items-center">
-            <div className="grow border-t border-stone-400"></div>
-            <span className="shrink mx-4 text-stone-400">or</span>
-            <div className="grow border-t border-stone-400"></div>
-          </div>
-          <button
-            className="w-full py-2 rounded mt-2 hover:bg-stone-100 font-bold border justify-center border-stone-500
-          "
-          >
-            <div className="flex justify-center">
-              <FcGoogle size={22} />
-              <span className="ms-2 text-stone-600">Log in with Google</span>
-            </div>
-          </button>
         </form>
       </div>
     </div>

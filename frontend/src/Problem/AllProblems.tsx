@@ -171,7 +171,6 @@ export default function AllProblems() {
                 key={concept}
                 onClick={() => {
                   setSelectedCategory(concept as ProblemCategory);
-                  console.log(concept);
                 }}
                 className={`px-4 py-2 rounded-full text-sm font-semibold text-nowrap
                 ${

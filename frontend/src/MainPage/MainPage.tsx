@@ -39,7 +39,6 @@ export default function MainPage() {
         </p> */}
         <Routes>
           <Route path="/" element={<Navigate to="allproblems" />} />
-          <Route path="settings" element={<Setting />} />
           <Route path="profile" element={<Profile />} />
           <Route path="report" element={<Report />} />
           <Route path="allproblems" element={<AllProblems />} />
