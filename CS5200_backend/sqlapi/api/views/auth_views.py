@@ -1,3 +1,9 @@
+"""
+- POST /login/                  authenticate user (email + password), return profile & account info  
+- GET  /profile/{id}/           fetch user profile and account info by account number  
+- POST /profile/{id}/update/    update user first/last name, return updated profile  
+"""
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db import connection
@@ -46,6 +52,7 @@ def login(request):
         "isAdmin": profile[4],
     })
 
+
 @api_view(['GET'])
 def get_profile(request, account_number):
     with connection.cursor() as cursor:
@@ -74,6 +81,7 @@ def get_profile(request, account_number):
         "isStudent": profile[4],
         "isAdmin": profile[5],
     })
+
 
 @api_view(['POST'])
 def update_profile(request, account_number):

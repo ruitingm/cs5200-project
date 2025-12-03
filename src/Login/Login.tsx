@@ -1,6 +1,12 @@
-// TODO:
-// 1. Connect to db for login credential check
-// 2. Set visible password when click on eye button
+/**
+ * UI for users to log in with email & password  
+ * - Calls backend via loginApi and, if successful stores user info in Redux  
+ * - Redirects user to main page on successful login; shows error messages on failure  
+ * 
+ * TODO:
+ * Connect to backend databae for login credential check
+ */
+
 import { EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
@@ -44,11 +50,10 @@ export default function Login() {
         return;
       }
 
-      // ✅ 把 Django / loginApi 返回的数据映射到 Redux 的 User 类型
       dispatch(
         setCurrentUser({
           email: result.email,
-          firstName: result.firstName, // 确保 loginApi 已经转成 camelCase
+          firstName: result.firstName, // ensure loginApi has turned to camelCase
           lastName: result.lastName,
           accountNumber: result.accountNumber,
           isStudent: result.isStudent, // boolean
@@ -119,7 +124,7 @@ export default function Login() {
             className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
             onClick={(e) => {
               e.preventDefault();
-              handleLogin(); // ✅ 不再传 email / password
+              handleLogin();
             }}
             disabled={loading}
           >

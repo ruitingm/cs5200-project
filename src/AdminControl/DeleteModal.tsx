@@ -1,3 +1,16 @@
+/**
+ * A reusable modal dialog that handles delete confirmatiom flow
+ * - Uses @headlessui/react’s Dialog to show a modal overlay and panel
+ * - Ensures user must confirm deletion before proceeding
+ * - On “Delete” click:
+ *  > closes the modal  
+ *  > dispatches either deleteUser or deleteProblem action via Redux  
+ * 
+ * TODO:
+ * Need backend API calls, right now it only updates Redux store.
+ * Need loading/error message if backend call fails.
+ */
+
 import {
   Dialog,
   DialogBackdrop,

@@ -1,3 +1,8 @@
+/**
+ * - Displays a specific SQL problem and allows the user to write and submit a SQL solution  
+ * - On submit, sends the code to backend via API; shows success or error feedback  
+ * - After successful submission, shows whether test passed and reveals the official solution if available  
+ */
 // TODO
 // 1. Add solution
 import { Check, X, Undo2 } from "lucide-react";

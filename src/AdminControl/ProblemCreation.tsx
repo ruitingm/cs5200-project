@@ -1,4 +1,23 @@
-import { useState} from "react";
+/**
+ * Lets admin review and publish a new or edited SQL problem
+ * - Loads the problem from Redux store by pId
+ * - Renders a form letting the admin set or edit different fields
+ * - Maintains internal form state using React’s useState hook
+ * - On “Publish” button click:
+ *  > Creates a temporary solution ID  
+ *  > Dispatches the addSolution action to Redux
+ *  > Creates an updated Problem object
+ *  > Dispatches the updateProblem action to Redux
+ *  > Calls onBack() to go back to the problem list view  
+ * - Renders the form inside a scrollable panel
+ * 
+ * TODO:
+ * Need backend API calls, right now it only updates Redux store.
+ * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
+ * Need loading/error message if backend call fails.
+ */
+
+import * as react from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { updateProblem } from "../Problem/problemSlice";
@@ -10,6 +29,7 @@ import {
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
 import { addSolution } from "../Problem/solutionSlice";
+
 export default function ProblemCreation({
   pId,
   onBack,
@@ -35,13 +55,14 @@ export default function ProblemCreation({
       </div>
     );
   }
-  const [title, setTitle] = useState(problem.pTitle);
-  const [description, setDescription] = useState(problem.pDescription);
-  const [difficulty, setDifficulty] = useState<ProblemDifficultyTag>(
+  
+  const [title, setTitle] = react.useState(problem.pTitle);
+  const [description, setDescription] = react.useState(problem.pDescription);
+  const [difficulty, setDifficulty] = react.useState<ProblemDifficultyTag>(
     problem.difficultyTag
   );
-  const [concepts, setConcepts] = useState<ProblemCategory[]>([...problem.conceptTag]);
-  const [solution, setSolution] = useState("");
+  const [concepts, setConcepts] = react.useState<ProblemCategory[]>([...problem.conceptTag]);
+  const [solution, setSolution] = react.useState("");
   const toggleConcept = (tag: ProblemCategory) => {
     setConcepts((prev) =>
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]

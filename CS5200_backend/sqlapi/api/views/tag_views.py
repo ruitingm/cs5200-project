@@ -2,15 +2,9 @@ from django.db import connection
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-# --------------------------
-# GET /topics/
-# --------------------------
+# GET topic = difficulty + concept
 @api_view(['GET'])
 def list_tags(request):
-    """
-    Return all topics (tags).
-    A topic = Difficulty + Concept.
-    """
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 
@@ -35,14 +29,9 @@ def list_tags(request):
     return Response(topics)
 
 
-# --------------------------
-# GET /topics/<tag_id>/problems/
-# --------------------------
+# Return all problems for a given topic (tag)
 @api_view(['GET'])
 def list_tag_problems(request, tag_id):
-    """
-    Return all problems for a given topic (tag).
-    """
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 

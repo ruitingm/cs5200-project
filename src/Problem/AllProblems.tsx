@@ -1,3 +1,14 @@
+/**
+ * Main page listing all SQL problems for users  
+ * - Fetches all problems on load via Redux thunk
+ * - Loads tags, supports filtering
+ * 
+ * TODO:
+ * Right now, clicking a tag triggers a fetch from /tags/{tagId}/problems/ 
+ * but you don’t update the displayed problem list with fetched result.
+ * Need to either merge with Redux or update local state so filter actually works.
+ */
+
 // import { useRef } from "react";
 // import { ChevronRight } from "lucide-react";
 // import { Link } from "react-router";
@@ -281,6 +292,7 @@ export default function AllProblems() {
               pId={p.pId}
               pTitle={p.pTitle}
               difficultyTag={p.difficultyTag}
+              conceptTags={p.conceptTag}
             />
           ))
         )}

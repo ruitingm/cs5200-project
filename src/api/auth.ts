@@ -1,3 +1,8 @@
+/**
+ * - Sends login requests to backend API with email and password  
+ * - Parses and returns user info  on success  
+ */
+
 export async function loginApi(email: string, password: string) {
   const response = await fetch(
     "https://sql-study-room-2025.uw.r.appspot.com/auth/login/",
@@ -13,7 +18,7 @@ export async function loginApi(email: string, password: string) {
   return {
     success: data.success,
     email: data.email,
-    firstName: data.firstName, // ← ✔ 后端就是 camelCase
+    firstName: data.firstName,
     lastName: data.lastName,
     accountNumber: data.accountNumber,
     isStudent: data.isStudent === 1,

@@ -1,3 +1,13 @@
+/**
+ * Displays a searchable list of all users 
+ * - Lets admin filter users 
+ * - Shows a delete button next to each user that opens DeleteModal
+ * - Uses Redux store to get the current list of users via useSelector
+ * 
+ * TODO:
+ * Backend integrtion
+ */
+
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useSelector } from "react-redux";

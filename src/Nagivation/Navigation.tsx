@@ -1,3 +1,10 @@
+/**
+ * Sidebar navigation menu 
+ * - Shows different links (Problems, Chat, Reports, Profile, Settings)  
+ * - Admin link visible only to admin users  
+ * - Displays current user name and role at bottom of sidebar  
+ */
+
 import {
   ScrollText,
   MessageCircleMore,
@@ -10,6 +17,7 @@ import { useLocation } from "react-router-dom";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
+
 export default function NavigationBar() {
   const currentUser = useSelector(
     (state: RootState) => state.userReducer.currentUser
@@ -28,6 +36,7 @@ export default function NavigationBar() {
     },
     { label: "settings", path: "/main/settings", icon: Settings },
   ];
+
   return (
     <aside
       id="navigation"

@@ -1,3 +1,12 @@
+/**
+ * Chat interface to use LLM assistant  
+ * - Maintains message history in state and shows chat UI 
+ * - Supports a route for creating new problems via LLM ("/llm-problem-creation")  
+ * 
+ * TODO:
+ * Right now uses local component state. Need to connect this to backend and LLM
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import { Plus } from "lucide-react";

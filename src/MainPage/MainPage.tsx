@@ -1,3 +1,11 @@
+/**
+ * Main layout and router after user login  
+ * - Shows navigation bar + main content area  
+ * - Checks if user is logged in; if not, redirects to login/signup  
+ * - Defines routes for various pages 
+ * - Displays a welcome message including user’s name and role  
+ */
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import NavigationBar from "../Nagivation/Navigation";
 import Profile from "../Profile/Profile";
@@ -27,7 +35,6 @@ export default function MainPage() {
       </div>
       {/* <div className="bg-stone-100 rounded-xl m-2 flex flex-col min-h-0 overflow-hidden"> */}
       <div className="bg-stone-100 rounded-xl m-2 p-4">
-        {/* 🔥 登录后欢迎信息 */}
         <h1 className="text-2xl font-bold mb-2">
           Welcome, {currentUser.firstName} {currentUser.lastName}!
         </h1>

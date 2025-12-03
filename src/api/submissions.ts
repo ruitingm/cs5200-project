@@ -1,3 +1,8 @@
+/**
+ * - fetchSubmissionsApi(accountNumber): GET request to fetch user’s submission history  
+ * - submitProblemApi(problemId, data): POST request to submit a SQL solution for a problem  
+ */
+
 const BASE_URL = "https://sql-study-room-2025.uw.r.appspot.com";
 
 export async function fetchSubmissionsApi(accountNumber: number) {

@@ -1,23 +1,28 @@
-export type ProblemProps = {
-  id: number;
-  title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  concept: string;
-  solved: boolean;
+/**
+ * Represents one problem in the problem list  
+ * - Renders a link to the problem’s detail/edit page
+ * - Shows problem ID, title, difficulty, and a “solved” checkmark icon  
+ */
+
+export interface ProblemItemProps {
+  pId: number;
+  pTitle: string;
+  difficultyTag: ProblemDifficultyTag;
+  conceptTags?: string[];
+  solved?: boolean;
 };
 
 import { Check } from "lucide-react";
 import { Link } from "react-router";
 import type { ProblemDifficultyTag } from "./problemType";
+
 export default function ProblemItem({
   pId,
   pTitle,
   difficultyTag,
-}: {
-  pId: number;
-  pTitle: string;
-  difficultyTag: ProblemDifficultyTag;
-}) {
+  conceptTags = [],
+  solved = false,
+}: ProblemItemProps) {
   const getDifficultyColor = () => {
     switch (difficultyTag) {
       case "Easy":
@@ -30,7 +35,7 @@ export default function ProblemItem({
         return "text-gray-700";
     }
   };
-  const solved = true;
+
   return (
     <Link
       to={`/main/problems/${pId}`}
@@ -39,10 +44,23 @@ export default function ProblemItem({
       <div className="w-5 flex justify-center me-2">
         {solved && <Check size={15} className="text-emerald-700" />}
       </div>
-      <div className="flex items-center gap-3 flex-1">
-        <span className="font-medium">
+
+      <div className="flex flex-col flex-1">
+        <span className="font-medium truncate">
           {pId}. {pTitle}
         </span>
+        {conceptTags.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-2">
+            {conceptTags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 bg-stone-300 text-xs rounded-full text-stone-800"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-6 text-sm">

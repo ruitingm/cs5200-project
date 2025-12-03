@@ -1,3 +1,8 @@
+"""
+- list_problems: returns a JSON list of all problems 
+- get_problem: returns one problem
+- submit_problem: handles submitting a solution for a problem (inserting into SUBMISSION table)  
+"""
 import json
 from django.db import connection
 from django.http import JsonResponse
@@ -30,10 +35,9 @@ def list_problems(request):
         difficulty = row[3] or ""
         concept = row[4] or ""
 
-        # 直接生成 title
+        # generate title
         p_title = description.split("\n")[0][:80]
 
-        # concept 转换为数组
         concept_tags = (
             [c.strip().capitalize() for c in concept.split(",")]
             if concept else []
@@ -43,13 +47,14 @@ def list_problems(request):
             "pId": problem_id,
             "pTitle": p_title,
             "difficultyTag": difficulty.capitalize(),
-            "conceptTag": concept_tags,   # ⭐ 用真正的 concept_tags
+            "conceptTag": concept_tags,
             "pDescription": description,
-            "pSolutionId": 1,
+            "pSolutionId": 1,   # this is a placeholder. Need real solution ID from database
             "reviewed": True
         })
 
     return JsonResponse(results, safe=False)
+
 
 # Get a single problem
 def get_problem(request, pid):
@@ -79,7 +84,6 @@ def get_problem(request, pid):
     difficulty = row[3]
     concept = row[4]
 
-    # 同样应用转换
     p_title = description.split("\n")[0][:80] if description else ""
     concept_tags = (
         [c.strip() for c in concept.split(",")] if concept else []
@@ -96,11 +100,8 @@ def get_problem(request, pid):
     })
 
 
-
-
 # Submit SQL answer
 @api_view(["POST"])
-
 def submit_problem(request, pid):
     data = json.loads(request.body)
 

@@ -1,3 +1,20 @@
+/**
+ * Administrator dashboard component for SQL Study Room
+ * - A tabbed interface so admin can switch between user and problem management
+ * - Manages internal state
+ *  > which tab is active
+ *  > which mode in the problems tab: view/create/edit  
+ *  > which problem is selected for creating/editing  
+ * - Conditionally renders different panels/components
+ *  > UserPanel when “users” tab selected  
+ *  > ProblemPanel when “problems” tab and list mode  
+ *  > ProblemCreation or ProblemEditor when creating/editing 
+ * 
+ * TODO:
+ * Need backend API calls for user and problem operations (instead of just Redux-local actions).
+ * Need loading/error message if backend call fails
+ */
+
 import { useState } from "react";
 import UserPanel from "./UserPanel";
 import ProblemPanel from "./ProblemPanel";

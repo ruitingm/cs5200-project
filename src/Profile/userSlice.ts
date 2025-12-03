@@ -1,3 +1,14 @@
+/**
+ * - Manages user-related state in Redux 
+ *  > currentUser = the logged-in user  
+ *  > users = list of all users (for admin view)  
+ * - Defines reducers / actions to:  
+ *  > set current user on login/signup
+ *  > update first/last name of current user  
+ *  > set the full users list (e.g. when loaded from backend)  
+ *  > delete a user (filter out from users list)  
+ */
+
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "./userType";
