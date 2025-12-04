@@ -1,8 +1,8 @@
 /**
- * - Defines Redux state slice for “problems” (list of SQL problems)  
- * - Manages problem list, loading status, and errors  
- * - Supports async fetching of problems from backend via fetchProblems thunk  
- * - Also provides reducers to set/add/delete/update problems (for client-side or admin actions)  
+ * - Defines Redux state slice for “problems” (list of SQL problems)
+ * - Manages problem list, loading status, and errors
+ * - Supports async fetching of problems from backend via fetchProblems thunk
+ * - Also provides reducers to set/add/delete/update problems (for client-side or admin actions)
  */
 
 import {

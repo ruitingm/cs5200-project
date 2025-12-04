@@ -123,3 +123,38 @@ def update_profile(request, account_number):
         "isStudent": profile[4],
         "isAdmin": profile[5],
     })
+
+@api_view(['GET'])
+def list_users(request):
+    """
+    Return list of all users with profile + account info.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                a.Account_number,
+                p.First_name,
+                p.Last_name,
+                p.Email,
+                a.Student_flag,
+                a.Admin_flag,
+                a.Register_date
+            FROM ACCOUNT a
+            JOIN USER_PROFILE p ON a.Email = p.Email
+            ORDER BY a.Account_number;
+        """)
+        rows = cursor.fetchall()
+
+    users = []
+    for r in rows:
+        users.append({
+            "accountNumber": r[0],
+            "firstName": r[1],
+            "lastName": r[2],
+            "email": r[3],
+            "isStudent": r[4],
+            "isAdmin": r[5],
+            "registerDate": r[6],
+        })
+
+    return Response(users)

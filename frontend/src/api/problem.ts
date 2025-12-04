@@ -26,16 +26,62 @@ export async function fetchProblemsApi() {
  * @param reviewed - true to get reviewed problems, false to get unreviewed problems
  */
 export async function fetchReviewedProblemsApi(reviewed: boolean = false) {
-  const response = await fetch(`${BASE_URL}/problems/?reviewed=${reviewed}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/problems/?reviewed=${reviewed}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to fetch reviewed problems");
   }
 
   return await response.json();
+}
+export async function addProblemApi(data: {
+  problem_description: string;
+  tag_id: number;
+}) {
+  const res = await fetch("/problems/add/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function deleteProblemApi(problemId: number) {
+  const res = await fetch(`${API_BASE_URL}/problems/${problemId}/delete/`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) throw new Error("Failed to delete problem");
+  return res.json();
+}
+
+export async function updateProblemApi(problemId: number, payload: any) {
+  const res = await fetch(`${API_BASE_URL}/problems/${problemId}/update/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    console.error("Update failed", await res.text());
+    throw new Error("Failed to update problem");
+  }
+
+  return res.json();
+}
+export async function publishProblemApi(id: number) {
+  const res = await fetch(`${API_BASE_URL}/problems/${id}/publish/`, {
+    method: "POST",
+  });
+  return res.json();
 }
