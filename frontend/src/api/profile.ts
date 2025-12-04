@@ -3,10 +3,10 @@
  * - updateProfileApi(accountNumber, data): POST request to update user’s first and last name  
  */
 
-const BASE_URL = "https://sql-study-room-2025.uw.r.appspot.com";
+import API_BASE_URL from "./config";
 
 export async function fetchProfileApi(accountNumber: number) {
-  const response = await fetch(`${BASE_URL}/profile/${accountNumber}/`, {
+  const response = await fetch(`${API_BASE_URL}/profile/${accountNumber}/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export async function updateProfileApi(
   data: { firstName: string; lastName: string }
 ) {
   const response = await fetch(
-    `${BASE_URL}/profile/${accountNumber}/update/`,
+    `${API_BASE_URL}/profile/${accountNumber}/update/`,
     {
       method: "POST",
       headers: {

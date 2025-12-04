@@ -1,17 +1,16 @@
 /**
- * - Sends login requests to backend API with email and password  
- * - Parses and returns user info  on success  
+ * - loginApi: Sends a POST request to the /auth/login/ endpoint with email and password
+ * - signupApi: Sends a POST request to the /auth/signup/ endpoint with user details
  */
 
+import API_BASE_URL from "./config";
+
 export async function loginApi(email: string, password: string) {
-  const response = await fetch(
-    "https://sql-study-room-2025.uw.r.appspot.com/auth/login/",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
   const data = await response.json();
 
@@ -24,4 +23,22 @@ export async function loginApi(email: string, password: string) {
     isStudent: data.isStudent === 1,
     isAdmin: data.isAdmin === 1,
   };
+}
+
+
+export async function signupApi(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}) {
+  const response = await fetch(`${API_BASE_URL}/auth/signup/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  return result;
 }

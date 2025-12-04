@@ -7,7 +7,7 @@
  *  > dispatches either deleteUser or deleteProblem action via Redux  
  * 
  * TODO:
- * Need backend API calls, right now it only updates Redux store.
+ * [DONE] Need backend API calls, right now it only updates Redux store.
  * Need loading/error message if backend call fails.
  */
 
@@ -18,10 +18,12 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 import type { User } from "../Profile/userType";
 import { deleteUser } from "../Profile/userSlice";
 import type { Problem } from "../Problem/problemType";
 import { deleteProblem } from "../Problem/problemSlice";
+import { deleteUserApi } from "../api/users";
 
 export default function DeleteModal({
   openModal,
@@ -35,6 +37,30 @@ export default function DeleteModal({
   problem?: Problem;
 }) {
   const dispatch = useDispatch();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
+    try {
+      if (user?.accountNumber) {
+        await deleteUserApi(user.accountNumber);
+      }
+
+      if (user) {
+        dispatch(deleteUser(user));
+      }
+
+      if (problem) {
+        dispatch(deleteProblem(problem));
+      }
+    } catch (error) {
+      console.log("failed to delete item", error);
+    } finally {
+      setIsDeleting(false);
+      setOpenModal(false);
+    }
+  };
   return (
     <Dialog open={openModal} onClose={setOpenModal} className="relative z-10">
       <DialogBackdrop
@@ -60,8 +86,8 @@ export default function DeleteModal({
                   <div className="mt-2">
                     <p className="text-sm text-stone-700">
                       {user
-                        ? `Are you sure you want to delete ${user.firstName} ${user.lastName}`
-                        : `Are you sure you want to delete ${problem?.pTitle}`}
+                        ? `Are you sure you want to delete ${user.firstName} ${user.lastName}?`
+                        : `Are you sure you want to delete ${problem?.pTitle}?`}
                     </p>
                   </div>
                 </div>
@@ -70,18 +96,11 @@ export default function DeleteModal({
             <div className="bg-stone-200 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
               <button
                 type="button"
-                onClick={() => {
-                  setOpenModal(false);
-                  if (user) {
-                    dispatch(deleteUser(user));
-                  }
-                  if (problem) {
-                    dispatch(deleteProblem(problem));
-                  }
-                }}
+                onClick={handleDelete}
+                disabled={isDeleting}
                 className="inline-flex w-full justify-center rounded-md bg-rose-700 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-800 sm:ml-3 sm:w-auto"
               >
-                Delete
+                {isDeleting ? "Deleting..." : "Delete"}
               </button>
               <button
                 type="button"

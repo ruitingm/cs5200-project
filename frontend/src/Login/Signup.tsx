@@ -13,21 +13,55 @@ import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { setCurrentUser } from "../Profile/userSlice";
+import { signupApi } from "../api/auth";
 
 export default function Signup() {
   const [user, setUser] = useState<any>({});
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [error] = useState(null);
-  const signupHandler = () => {
-    setUser({
-      ...user,
-      registerDate: new Date(),
-      isAdmin: false,
-      isStudent: true,
-    });
-    dispatch(setCurrentUser(user));
-    navigate("/main");
+
+  const signupHandler = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!user.firstName || !user.lastName || !user.email || !user.password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await signupApi({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        password: user.password,
+      });
+
+      if (!result.success) {
+        setError(result.message || "Signup failed.");
+        return;
+      }
+
+      dispatch(
+        setCurrentUser({
+          email: result.email,
+          firstName: result.firstName,
+          lastName: result.lastName,
+          accountNumber: result.accountNumber,
+          isStudent: result.isStudent,
+          isAdmin: result.isAdmin,
+        })
+      );
+
+      navigate("/main");
+    } catch (err) {
+      setError("Server error. Try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,8 +140,9 @@ export default function Signup() {
           <button
             className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
             onClick={signupHandler}
+            disabled={loading}
           >
-            Sign up
+            {loading ? "Signing up..." : "Sign up"}
           </button>
           <div className="text-sm text-center">
             Already have an account? &nbsp;

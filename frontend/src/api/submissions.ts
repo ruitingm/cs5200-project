@@ -3,11 +3,11 @@
  * - submitProblemApi(problemId, data): POST request to submit a SQL solution for a problem  
  */
 
-const BASE_URL = "https://sql-study-room-2025.uw.r.appspot.com";
+import API_BASE_URL from "./config";
 
 export async function fetchSubmissionsApi(accountNumber: number) {
   const response = await fetch(
-    `${BASE_URL}/submissions/${accountNumber}/`,
+    `${API_BASE_URL}/submissions/${accountNumber}/`,
     {
       method: "GET",
       headers: {
@@ -28,7 +28,7 @@ export async function submitProblemApi(
   data: { accountNumber: number; submission: string; isCorrect?: boolean }
 ) {
   const response = await fetch(
-    `${BASE_URL}/problems/${problemId}/submit/`,
+    `${API_BASE_URL}/problems/${problemId}/submit/`,
     {
       method: "POST",
       headers: {

@@ -3,16 +3,15 @@
  * - Returns parsed JSON of problems on success
  */
 
+import API_BASE_URL from "./config";
+
 export async function fetchProblemsApi() {
-  const response = await fetch(
-    "https://sql-study-room-2025.uw.r.appspot.com/problems/",
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/problems/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch problems");

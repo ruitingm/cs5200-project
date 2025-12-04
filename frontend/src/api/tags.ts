@@ -3,10 +3,10 @@
  * - fetchTagProblemsApi(tagId): GET request to fetch all problems associated with a specific tag
  */
 
-const BASE_URL = "https://sql-study-room-2025.uw.r.appspot.com";
+import API_BASE_URL from "./config";
 
 export async function fetchTagsApi() {
-  const response = await fetch(`${BASE_URL}/tags/`, {
+  const response = await fetch(`${API_BASE_URL}/tags/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -21,7 +21,7 @@ export async function fetchTagsApi() {
 }
 
 export async function fetchTagProblemsApi(tagId: number) {
-  const response = await fetch(`${BASE_URL}/tags/${tagId}/problems/`, {
+  const response = await fetch(`${API_BASE_URL}/tags/${tagId}/problems/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export async function fetchTagProblemsApi(tagId: number) {
 }
 
 export async function fetchFilteredProblemsApi(tagId: number) {
-  const response = await fetch(`${BASE_URL}/tags/${tagId}/problems/`, {
+  const response = await fetch(`${API_BASE_URL}/tags/${tagId}/problems/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

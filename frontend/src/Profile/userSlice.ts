@@ -1,12 +1,12 @@
 /**
- * - Manages user-related state in Redux 
+ * - Manages user-related state in Redux
  *  > currentUser = the logged-in user  
  *  > users = list of all users (for admin view)  
  * - Defines reducers / actions to:  
  *  > set current user on login/signup
  *  > update first/last name of current user  
- *  > set the full users list (e.g. when loaded from backend)  
- *  > delete a user (filter out from users list)  
+ *  > set the full users list (for admin view)
+ *  > delete a user 
  */
 
 import { createSlice } from "@reduxjs/toolkit";
@@ -45,11 +45,14 @@ const userSlice = createSlice({
     },
     deleteUser: (state, action: PayloadAction<User>) => {
       state.users = state.users.filter(
-        (user) => user.userId !== action.payload.userId
+        (user) =>
+          user.accountNumber !== action.payload.accountNumber &&
+          user.email !== action.payload.email
       );
     },
   },
 });
+
 export const {
   setCurrentUser,
   updateFirstName,
@@ -57,4 +60,5 @@ export const {
   setUsers,
   deleteUser,
 } = userSlice.actions;
+
 export default userSlice.reducer;
