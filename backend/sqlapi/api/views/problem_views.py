@@ -35,9 +35,11 @@ def list_problems(request):
     for row in rows:
         problem_id = row[0]
         description = row[1] or ""
-        difficulty = row[3] or ""
-        concept = row[4] or ""
-        title = row[5] or ""
+        review_status = row[2]
+        tag_id = row[3]
+        difficulty = row[4] or ""
+        concept = row[5] or ""
+        title = row[6] or ""
 
         # generate title
         # p_title = description.split("\n")[0][:80]
@@ -50,11 +52,11 @@ def list_problems(request):
         results.append({
             "pId": problem_id,
             "pTitle": title,
-            "difficultyTag": difficulty.capitalize(),
+            "difficultyTag": difficulty.capitalize() if difficulty else "",
             "conceptTag": concept_tags,
             "pDescription": description,
-            "pSolutionId": solutions,   # TODO: replace with real Solution_ID
-            "reviewed": True if views == 1 else False   
+            "pSolutionId": tag_id,
+            "reviewed": True if review_status == 1 else False   
         })
 
     return JsonResponse(results, safe=False)

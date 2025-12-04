@@ -1,5 +1,5 @@
 /**
- * - fetchUsersApi: Sends a GET request to the /users/ endpoint to retrieve a list of users  
+ * - fetchUsersApi: Sends a GET request to the /users/ endpoint to retrieve a list of users
  * - deleteUserApi: Sends a DELETE request to the /users/{accountNumber}/ endpoint to delete a user
  */
 

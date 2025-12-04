@@ -26,14 +26,15 @@ export default function UserPanel() {
       u.email.toLowerCase().includes(search.toLowerCase())
   );
   const [openModal, setOpenModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<typeof users[number] | null>(
-    null
-  );
+  const [selectedUser, setSelectedUser] = useState<
+    (typeof users)[number] | null
+  >(null);
 
   useEffect(() => {
     const loadUsers = async () => {
       try {
         const result = await fetchUsersApi();
+        console.log(result);
         dispatch(setUsers(result));
         setLoadError(null);
       } catch (error) {
@@ -113,20 +114,20 @@ export default function UserPanel() {
                     <td className="p-3">
                       <div className="flex items-center justify-center">
                         <button
-                        className="text-rose-700 hover:text-rose-800 hover:cursor-pointer"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setOpenModal(true);
-                        }}
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                          className="text-rose-700 hover:text-rose-800 hover:cursor-pointer"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setOpenModal(true);
+                          }}
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
           {selectedUser && (
             <DeleteModal

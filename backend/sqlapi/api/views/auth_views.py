@@ -158,3 +158,38 @@ def list_users(request):
         })
 
     return Response(users)
+
+@api_view(['DELETE'])
+def delete_user(request, account_number):
+    """
+    Delete a user by account number.
+    """
+    with connection.cursor() as cursor:
+        # Get email first
+        cursor.execute("""
+            SELECT Email FROM ACCOUNT WHERE Account_number = %s
+        """, [account_number])
+        result = cursor.fetchone()
+        
+        if not result:
+            return Response({"success": False, "message": "User not found"}, status=404)
+        
+        email = result[0]
+        
+        # Delete from ACCOUNT (will cascade to other tables if FK constraints are set)
+        cursor.execute("""
+            DELETE FROM ACCOUNT WHERE Account_number = %s
+        """, [account_number])
+        
+        # Delete from USER_AUTH
+        cursor.execute("""
+            DELETE FROM USER_AUTH WHERE Email = %s
+        """, [email])
+        
+        # Delete from USER_PROFILE
+        cursor.execute("""
+            DELETE FROM USER_PROFILE WHERE Email = %s
+        """, [email])
+    
+    return Response({"success": True, "message": "User deleted successfully"})
+
