@@ -4,13 +4,13 @@
  * - Renders a form letting the admin set or edit different fields
  * - Maintains internal form state using React’s useState hook
  * - On “Publish” button click:
- *  > Creates a temporary solution ID  
+ *  > Creates a temporary solution ID
  *  > Dispatches the addSolution action to Redux
  *  > Creates an updated Problem object
  *  > Dispatches the updateProblem action to Redux
- *  > Calls onBack() to go back to the problem list view  
+ *  > Calls onBack() to go back to the problem list view
  * - Renders the form inside a scrollable panel
- * 
+ *
  * TODO:
  * Need backend API calls, right now it only updates Redux store.
  * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
@@ -29,6 +29,8 @@ import {
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
 import { addSolution } from "../Problem/solutionSlice";
+import { updateProblemApi } from "../api/problem";
+import { publishProblemApi } from "../api/problem";
 
 export default function ProblemCreation({
   pId,
@@ -55,38 +57,63 @@ export default function ProblemCreation({
       </div>
     );
   }
-  
+
   const [title, setTitle] = react.useState(problem.pTitle);
   const [description, setDescription] = react.useState(problem.pDescription);
   const [difficulty, setDifficulty] = react.useState<ProblemDifficultyTag>(
     problem.difficultyTag
   );
-  const [concepts, setConcepts] = react.useState<ProblemCategory[]>([...problem.conceptTag]);
+  const [concepts, setConcepts] = react.useState<ProblemCategory[]>([
+    ...problem.conceptTag,
+  ]);
   const [solution, setSolution] = react.useState("");
   const toggleConcept = (tag: ProblemCategory) => {
     setConcepts((prev) =>
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
     );
   };
-  const handleSave = () => {
-    const tempSolutionId = Math.floor(Math.random() * 1000000);
-    dispatch(
-      addSolution({
-        sId: tempSolutionId,
-        sDescription: solution,
-      })
-    );
-    const updatedProblem: Problem = {
-      ...problem,
-      pTitle: title,
-      difficultyTag: difficulty,
-      conceptTag: concepts,
-      pDescription: description,
-      pSolutionId: tempSolutionId,
-      reviewed: true,
-    };
-    dispatch(updateProblem(updatedProblem));
-    onBack();
+  const handleSave = async () => {
+    try {
+      // 1. 先保存 Solution
+      const tempSolutionId = Math.floor(Math.random() * 1000000);
+      dispatch(
+        addSolution({
+          sId: tempSolutionId,
+          sDescription: solution,
+        })
+      );
+
+      // 2. 更新数据库中的 Problem (标题、描述、difficulty、concept)
+      await updateProblemApi(pId, {
+        pTitle: title,
+        pDescription: description,
+        difficultyTag: difficulty,
+        conceptTag: concepts.join(","),
+        solutionId: tempSolutionId,
+      });
+
+      // 3. 调用 publish API，把 reviewed=1 写进数据库
+      await publishProblemApi(pId);
+
+      // 4. 更新 Redux 前端状态
+      dispatch(
+        updateProblem({
+          ...problem,
+          pTitle: title,
+          difficultyTag: difficulty,
+          conceptTag: concepts,
+          pDescription: description,
+          pSolutionId: tempSolutionId,
+          reviewed: true,
+        })
+      );
+
+      alert("Problem published successfully!");
+      onBack();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to publish problem");
+    }
   };
 
   return (

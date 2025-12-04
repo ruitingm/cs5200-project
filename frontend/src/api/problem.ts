@@ -42,3 +42,46 @@ export async function fetchReviewedProblemsApi(reviewed: boolean = false) {
 
   return await response.json();
 }
+export async function addProblemApi(data: {
+  problem_description: string;
+  tag_id: number;
+}) {
+  const res = await fetch("/problems/add/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export async function deleteProblemApi(problemId: number) {
+  const res = await fetch(`${API_BASE_URL}/problems/${problemId}/delete/`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) throw new Error("Failed to delete problem");
+  return res.json();
+}
+
+export async function updateProblemApi(problemId: number, payload: any) {
+  const res = await fetch(`${API_BASE_URL}/problems/${problemId}/update/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    console.error("Update failed", await res.text());
+    throw new Error("Failed to update problem");
+  }
+
+  return res.json();
+}
+export async function publishProblemApi(id: number) {
+  const res = await fetch(`${API_BASE_URL}/problems/${id}/publish/`, {
+    method: "POST",
+  });
+  return res.json();
+}

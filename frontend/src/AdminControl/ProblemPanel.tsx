@@ -4,17 +4,18 @@
  * - Uses Redux store via useSelector to get current list of problems
  * - Includes DeleteModal to confirm deletions
  * - Calls onCreate or onEdit to trigger creation or edit
- * 
+ *
  * TODO:
  * Backend integration
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, PencilLine, Trash2 } from "lucide-react";
 import type { problemFilter } from "../Problem/problemType";
-import type { RootState } from "../store/store";
-import { useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../store/store";
+import { useSelector, useDispatch } from "react-redux";
 import DeleteModal from "./DeleteModal";
+import { fetchProblems } from "../Problem/problemSlice";
 
 export default function ProblemPanel({
   onCreate,
@@ -23,6 +24,11 @@ export default function ProblemPanel({
   onCreate: (id: number) => void;
   onEdit: (pId: number) => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(fetchProblems());
+  }, [dispatch]);
+
   const [filter, setFilter] = useState<problemFilter>("All");
   const problems = useSelector(
     (state: RootState) => state.problemReducer.problems
@@ -34,7 +40,7 @@ export default function ProblemPanel({
   });
   const filterOptions: problemFilter[] = ["All", "Reviewed", "Unreviewed"];
   const [openModal, setOpenModal] = useState(false);
-  
+
   return (
     <div className="flex flex-col flex-1 bg-stone-50 border border-stone-200 rounded-xl p-4 shadow-sm min-h-0">
       <div className="flex gap-3 mb-4">

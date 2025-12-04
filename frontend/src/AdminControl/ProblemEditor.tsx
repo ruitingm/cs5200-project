@@ -3,7 +3,7 @@
  * - Loads the problem from Redux store by pId
  * - Uses local state (useState) for form fields
  * - On “Save” click, dispatches updates to store and returns to the list view
- * 
+ *
  * TODO:
  * Need to connect to bakcend, right now only updates Redux store.
  * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
@@ -21,6 +21,8 @@ import {
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
 import { addSolution } from "../Problem/solutionSlice";
+import { updateProblemApi } from "../api/problem";
+
 export default function ProblemEditor({
   pId,
   onBack,
@@ -66,26 +68,40 @@ export default function ProblemEditor({
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
     );
   };
-  const handleSave = () => {
-    const tempSolutionId = Math.floor(Math.random() * 1000000);
-    dispatch(
-      addSolution({
-        sId: tempSolutionId,
-        sDescription: solution,
-      })
-    );
-    const updatedProblem: Problem = {
-      ...problem,
-      pTitle: title,
-      difficultyTag: difficulty,
-      conceptTag: concepts,
-      pDescription: description,
-      pSolutionId: tempSolutionId,
-      reviewed: true,
-    };
-    dispatch(updateProblem(updatedProblem));
-    onBack();
+
+  const difficultyToTagId: Record<string, number> = {
+    Easy: 1,
+    Medium: 2,
+    Hard: 3,
   };
+  const tagId = difficultyToTagId[difficulty];
+
+  const handleSave = async () => {
+    try {
+      // 1. 后端 PUT API — 发送 tagId（来自 difficulty）
+      await updateProblemApi(pId, {
+        title,
+        description,
+        tagId: tagId, // ⭐ 这是发给后端的字段
+      });
+
+      // 2. Redux 本地更新 — 用 difficultyTag（前端字段名）
+      dispatch(
+        updateProblem({
+          ...problem,
+          pTitle: title,
+          pDescription: description,
+          difficultyTag: difficulty, // ⭐ 注意这里
+          reviewed: true,
+        })
+      );
+
+      onBack();
+    } catch (error) {
+      console.error("Failed to update problem:", error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6 h-[600px] overflow-y-auto text-stone-800">
       <h2 className="text-2xl font-semibold mb-6">Edit Problem</h2>

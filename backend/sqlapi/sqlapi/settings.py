@@ -88,10 +88,20 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 #         'HOST': '34.168.79.184',
 #         'PORT': '3306',
 #         'OPTIONS': {
-#             'connect_timeout': 5,  # 👈 让连不上时尽快报错，而不是卡很久
+#             'connect_timeout': 5, 
 #         },
 #     }
 # }
+DATABASES = {
+    'default': {
+     'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sql_study_room',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
 
 # DATABASES = {
 #     'default': {
