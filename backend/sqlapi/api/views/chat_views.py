@@ -11,10 +11,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db import connection
 from datetime import datetime
+from django.utils import timezone
 import os
 
-# Set OpenAI API key from environment
-openai.api_key = os.getenv("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY_HERE")
+# Set OpenAI API key from environment - REQUIRED
+openai.api_key = os.getenv("OPENAI_API_KEY")
+if not openai.api_key:
+    raise RuntimeError("OPENAI_API_KEY environment variable is required")
 
 # Database schema context for LLM - Updated with actual schema
 DATABASE_SCHEMA = """
@@ -51,14 +54,18 @@ def is_safe_sql(sql):
     sql_clean = re.sub(r'/\*.*?\*/', '', sql_clean, flags=re.DOTALL)
     sql_clean = ' '.join(sql_clean.split())
     
-    # Only allow SELECT statements
-    if not sql_clean.startswith('SELECT'):
+    # CRITICAL: Block multiple statements (SQL injection prevention)
+    if ';' in sql_clean:
         return False
     
-    # Block dangerous keywords
+    # Allow SELECT and WITH (for CTEs)
+    if not re.match(r'^(SELECT|WITH)\b', sql_clean):
+        return False
+    
+    # Block dangerous keywords with word boundaries
     dangerous_keywords = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'CREATE', 'ALTER', 'TRUNCATE']
     for keyword in dangerous_keywords:
-        if keyword in sql_clean:
+        if re.search(rf'\b{keyword}\b', sql_clean):
             return False
     
     return True
@@ -70,7 +77,7 @@ def save_query_to_db(account_number, query_text):
             cursor.execute("""
                 INSERT INTO QUERY (Account_number, Query_text, Query_time)
                 VALUES (%s, %s, %s)
-            """, [account_number, query_text, datetime.now()])
+            """, [account_number, query_text, timezone.now()])
     except Exception as e:
         print(f"Failed to save query: {e}")
 
@@ -117,6 +124,10 @@ SQL Query:
         sql = re.sub(r'```sql\s*', '', sql)
         sql = re.sub(r'```\s*', '', sql)
         sql = sql.strip()
+        
+        # Enforce LIMIT 50 for performance protection
+        if not re.search(r'\bLIMIT\b', sql, re.IGNORECASE):
+            sql = f"({sql}) LIMIT 50"
         
         # 2. Validate SQL safety
         if not is_safe_sql(sql):
