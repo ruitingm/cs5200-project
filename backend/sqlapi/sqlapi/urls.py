@@ -22,6 +22,7 @@ from api.views.tag_views import list_tags, list_tag_problems
 from api.views.submission_views import list_submissions
 from api.views.chat_views import nl2sql
 from api.views.admin_views import admin_user_stats, admin_problem_stats
+from api.views.solutioin_views import get_solution
 
 
 urlpatterns = [
@@ -39,6 +40,8 @@ urlpatterns = [
     path("problems/add/", add_problem),
     path("problems/<int:pid>/", get_problem),
     path("problems/", list_problems),
+
+    path("solutions/<int:pId>/", get_solution),
 
     path("tags/", list_tags),
     path("tags/<int:tag_id>/problems/", list_tag_problems),
