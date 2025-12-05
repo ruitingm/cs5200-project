@@ -21,8 +21,9 @@ function ChatPanel() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [lastRawResponse, setLastRawResponse] =
-    useState<NL2SQLResponse | null>(null);
+  const [lastRawResponse, setLastRawResponse] = useState<NL2SQLResponse | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
 
   async function handleSend() {
@@ -97,12 +98,11 @@ function ChatPanel() {
             <ul className="list-disc list-inside mt-1">
               <li>"Show me all problems tagged as EASY."</li>
               <li>
-                "How many problems did account 10001 submit in the last 7
-                days?"
+                "How many problems did account 10001 submit in the last 7 days?"
               </li>
               <li>
-                "List all submissions with their problem description for
-                account 10001."
+                "List all submissions with their problem description for account
+                10001."
               </li>
             </ul>
           </div>

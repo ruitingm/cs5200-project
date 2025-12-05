@@ -41,7 +41,17 @@ def add_solution(request):
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO SOLUTION (Problem_ID, Solution_Description) VALUES (%s, %s)", [pId, sDescription])
+            # Check if solution exists
+            cursor.execute("SELECT Solution_ID FROM SOLUTION WHERE Problem_ID = %s", [pId])
+            existing = cursor.fetchone()
+
+            if existing:
+                # Update existing
+                cursor.execute("UPDATE SOLUTION SET Solution_Description = %s WHERE Problem_ID = %s", [sDescription, pId])
+            else:
+                # Insert new
+                cursor.execute("INSERT INTO SOLUTION (Problem_ID, Solution_Description) VALUES (%s, %s)", [pId, sDescription])
+            
             return Response({
                 'success': True
             })
