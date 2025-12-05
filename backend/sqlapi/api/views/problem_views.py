@@ -130,7 +130,6 @@ def submit_problem(request, pid):
     return JsonResponse({"success": True})
 
 #add problem
-
 @api_view(["POST"])
 def add_problem(request):
     """
@@ -146,8 +145,15 @@ def add_problem(request):
     solution_id = data.get("solution_id")  # can be None
     review_status = data.get("review_status", False)
 
-    if not tag_id or not title or not description:
-        return JsonResponse({"error": "Missing required fields"}, status=400)
+    if not tag_id:
+        return JsonResponse({"error": "Missing tag_id"}, status=400)
+    if not title:
+        return JsonResponse({"error": "Missing title"}, status=400)
+    if not description:
+        return JsonResponse({"error": "Missing description"}, status=400)
+ 
+    # if not tag_id or not title or not description:
+    #     return JsonResponse({"error": "Missing required fields"}, status=400)
 
     with connection.cursor() as cursor:
         cursor.execute("""

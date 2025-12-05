@@ -1,14 +1,3 @@
-/**
- * Main page listing all SQL problems for users
- * - Fetches all problems on load via Redux thunk
- * - Loads tags, supports filtering
- *
- * TODO:
- * Right now, clicking a tag triggers a fetch from /tags/{tagId}/problems/
- * but you don’t update the displayed problem list with fetched result.
- * Need to either merge with Redux or update local state so filter actually works.
- */
-
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProblems } from "./problemSlice";
@@ -16,7 +5,8 @@ import type { AppDispatch, RootState } from "../store/store";
 import ProblemItem from "./ProblemItem";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
-import { type ProblemCategory, type ProblemDifficultyTag } from "./problemType";
+import type { ProblemCategory, ProblemDifficultyTag } from "./problemType";
+import type { Problem } from "./problemType";
 import { fetchTagsApi, fetchFilteredProblemsApi } from "../api/tags";
 
 export default function AllProblems() {
@@ -31,7 +21,6 @@ export default function AllProblems() {
   // Filter state - separate selected (UI) from applied (backend)
   const [selectedCategory, setSelectedCategory] = useState<ProblemCategory>();
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>();
-  const [, setAppliedTagId] = useState<number | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
 
   // Tags data from backend: { tag_id, difficulty, concept }
@@ -44,15 +33,17 @@ export default function AllProblems() {
   >([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
+
+  // Filter results & state
+  const [filteredProblems, setFilteredProblems] = useState<Problem[]>([]);
+  const [filtersApplied, setFiltersApplied] = useState(false);
   const [filterMessage, setFilterMessage] = useState("");
   const [filtering, setFiltering] = useState(false);
-
-  // Filtered problems from backend
-  const [filteredProblems, setFilteredProblems] = useState<any[]>([]);
 
   // Load problems and tags on page load
   useEffect(() => {
     dispatch(fetchProblems());
+
     const loadTags = async () => {
       try {
         const result = await fetchTagsApi();
@@ -65,6 +56,7 @@ export default function AllProblems() {
         setTagsLoading(false);
       }
     };
+
     loadTags();
   }, [dispatch]);
 
@@ -72,13 +64,31 @@ export default function AllProblems() {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  // Apply filters: find matching tag and fetch filtered problems
+  /**
+   * Normalize different API responses into a consistent Problem shape
+   * Handles:
+   * - pId vs problem_id
+   * - pTitle vs title
+   * - pDescription vs description
+   */
+  const normalizeProblem = (p: any): Problem => ({
+    pId: p.pId ?? p.problem_id,
+    pTitle: p.pTitle ?? p.title ?? "Untitled Problem",
+    pDescription: p.pDescription ?? p.description ?? "",
+    difficultyTag: p.difficultyTag ?? p.difficulty ?? "Easy",
+    conceptTag: p.conceptTag ?? p.concepts ?? [],
+    pSolutionId: p.pSolutionId ?? null,
+    reviewed: p.reviewed ?? true,
+  });
+
+  // Apply filters: find matching tag(s) and fetch filtered problems
   const applyFilters = async () => {
     if (!selectedDifficulty && !selectedCategory) {
       return;
     }
 
     setFiltering(true);
+    setFiltersApplied(true);
     setFilterMessage("Applying filters...");
 
     try {
@@ -92,38 +102,40 @@ export default function AllProblems() {
       }
 
       if (selectedCategory) {
-        matchingTags = matchingTags.filter((tag) =>
-          tag.concept.toLowerCase().includes(selectedCategory.toLowerCase())
+        matchingTags = matchingTags.filter(
+          (tag) => tag.concept.toLowerCase() === selectedCategory.toLowerCase()
         );
       }
 
       if (matchingTags.length === 0) {
-        setFilterMessage("No matching tags found for this combination.");
         setFilteredProblems([]);
+        setFilterMessage("No matching tags found for this combination.");
         setFiltering(false);
         return;
       }
 
       // Fetch problems for all matching tags
-      const allProblems: any[] = [];
+      const allProblems: Problem[] = [];
+
       for (const tag of matchingTags) {
         const result = await fetchFilteredProblemsApi(tag.tag_id);
-        allProblems.push(...result);
+        const normalized: Problem[] = result.map(normalizeProblem);
+        allProblems.push(...normalized);
       }
 
-      // Remove duplicates based on problem_id
+      // Remove duplicates based on pId
       const uniqueProblems = Array.from(
-        new Map(allProblems.map((p) => [p.problem_id, p])).values()
+        new Map(allProblems.map((p) => [p.pId, p])).values()
       );
 
       setFilteredProblems(uniqueProblems);
-      setAppliedTagId(matchingTags[0].tag_id);
       setFilterMessage(
         `Found ${uniqueProblems.length} problem(s) matching your filters.`
       );
     } catch (error) {
       console.log("failed to fetch filtered problems", error);
       setFilterMessage("Failed to apply filters. Please try again.");
+      setFilteredProblems([]);
     } finally {
       setFiltering(false);
     }
@@ -133,23 +145,26 @@ export default function AllProblems() {
   const clearFilters = () => {
     setSelectedCategory(undefined);
     setSelectedDifficulty(undefined);
-    setAppliedTagId(null);
     setFilteredProblems([]);
+    setFiltersApplied(false);
     setFilterMessage("");
   };
 
-  // Determine which problems to display
-  const displayProblems =
-    filteredProblems.length > 0 ? filteredProblems : problems;
+  // Determine which problems to display:
+  // - If filtersApplied: always use filteredProblems (even if empty)
+  // - Else: use all problems from Redux (normalized)
+  const baseProblems: Problem[] = filtersApplied
+    ? filteredProblems
+    : problems.map(normalizeProblem);
 
   // Apply search filter client-side
-  const searchFilteredProblems = displayProblems.filter((p: any) => {
-    if (!searchKeyword) return true;
-    const title = p.pTitle || p.description || "";
-    const desc = p.pDescription || p.description || "";
+  const searchFilteredProblems = baseProblems.filter((p) => {
+    const key = searchKeyword.trim().toLowerCase();
+    if (!key) return true;
+
     return (
-      title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-      desc.toLowerCase().includes(searchKeyword.toLowerCase())
+      p.pTitle.toLowerCase().includes(key) ||
+      p.pDescription.toLowerCase().includes(key)
     );
   });
 
@@ -191,6 +206,7 @@ export default function AllProblems() {
           <ChevronRight size={20} />
         </button>
       </div>
+
       {/* ===================== DIFFICULTY FILTER ===================== */}
       <div className="flex gap-3 items-center">
         {["Easy", "Medium", "Hard"].map((diff) => (
@@ -198,7 +214,6 @@ export default function AllProblems() {
             key={diff}
             onClick={() => {
               setSelectedDifficulty(diff);
-              console.log(diff);
             }}
             className={`px-4 py-2 rounded-full text-sm font-semibold
               ${
@@ -212,6 +227,7 @@ export default function AllProblems() {
         ))}
       </div>
 
+      {/* ===================== TAG LOADING / ERROR / FILTER STATUS ===================== */}
       {tagsLoading && (
         <div className="text-sm text-stone-600">Loading tags…</div>
       )}
@@ -221,11 +237,13 @@ export default function AllProblems() {
       {filterMessage && (
         <div className="text-sm text-stone-600">{filterMessage}</div>
       )}
+
+      {/* ===================== FILTER ACTION BUTTONS ===================== */}
       <div className="flex space-x-4 justify-end">
         <button
           onClick={applyFilters}
           disabled={filtering}
-          className="ml-4 px-6 py-1 rounded-full text-sm font-semibold bg-rose-700 text-white hover:bg-rose-800 disabled:cursor-not-allowed"
+          className="ml-4 px-6 py-1 rounded-full text-sm font-semibold bg-rose-700 text-white hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {filtering ? "Applying..." : "Apply Filters"}
         </button>
@@ -236,6 +254,7 @@ export default function AllProblems() {
           Clear Filters
         </button>
       </div>
+
       {/* ===================== SEARCH FILTER ===================== */}
       <div className="flex gap-2 bg-white px-3 py-1 rounded-3xl shadow">
         <input
@@ -252,6 +271,7 @@ export default function AllProblems() {
           </button>
         </Link>
       </div>
+
       {/* ===================== PROBLEM LIST ===================== */}
       <div className="flex-1 overflow-y-auto rounded-lg">
         {searchFilteredProblems.length === 0 ? (
@@ -259,13 +279,13 @@ export default function AllProblems() {
             No problems match your filters.
           </div>
         ) : (
-          searchFilteredProblems.map((p: any) => (
+          searchFilteredProblems.map((p) => (
             <ProblemItem
-              key={p.pId || p.problem_id}
-              pId={p.pId || p.problem_id}
-              pTitle={p.pTitle || p.description}
-              difficultyTag={p.difficultyTag || "Easy"}
-              conceptTags={p.conceptTag || []}
+              key={p.pId}
+              pId={p.pId}
+              pTitle={p.pTitle}
+              difficultyTag={p.difficultyTag}
+              conceptTags={p.conceptTag}
             />
           ))
         )}

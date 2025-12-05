@@ -29,25 +29,45 @@ def list_tags(request):
     return Response(topics)
 
 
-# Return all problems for a given topic (tag)
 @api_view(['GET'])
 def list_tag_problems(request, tag_id):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 
-                P.Problem_ID,
-                P.Problem_description
-            FROM PROBLEM P
-            JOIN TAG T ON P.Tag_ID = T.Tag_ID
-            WHERE T.Tag_ID = %s;
+                p.Problem_ID,
+                p.Problem_description,
+                p.Review_status,
+                t.Tag_ID,
+                d.Difficulty_level,
+                c.SQL_concept,
+                p.Problem_title
+            FROM PROBLEM p
+            LEFT JOIN TAG t ON p.Tag_ID = t.Tag_ID
+            LEFT JOIN DIFFICULTY_TAG d ON t.Difficulty_ID = d.Difficulty_ID
+            LEFT JOIN CONCEPT_TAG c ON t.Concept_ID = c.Concept_ID
+            WHERE t.Tag_ID = %s AND p.Review_status = 1;
         """, [tag_id])
         rows = cursor.fetchall()
 
     problems = []
     for r in rows:
+        concept = r[5] or ""
+        difficulty = r[4] or ""
+        
+        concept_tags = (
+            [c.strip().capitalize() for c in concept.split(",")]
+            if concept else []
+        )
+        
         problems.append({
-            "problem_id": r[0],
-            "description": r[1],
+            "pId": r[0],
+            "pTitle": r[6] or "",
+            "difficultyTag": difficulty.capitalize() if difficulty else "",
+            "conceptTag": concept_tags,
+            "pDescription": r[1] or "",
+            # "pSolutionId": r[3],
+            "reviewed": True if r[2] == 1 else False
         })
 
     return Response(problems)
+

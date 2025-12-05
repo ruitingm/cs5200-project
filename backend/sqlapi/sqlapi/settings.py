@@ -142,20 +142,19 @@ DATABASES = {
 #     }
 # }
 
-# Hazel's local database configuration (currently active)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ.get('DB_NAME', 'sql_study_room'),
-#         'USER': os.environ.get('DB_USER', 'group6'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-#         'HOST': os.environ.get('DB_HOST', '34.182.64.16'),
-#         'PORT': os.environ.get('DB_PORT', '3306'),
-#         'OPTIONS': {
-#             'connect_timeout': 5,
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'sql_study_room'),
+        'USER': os.environ.get('DB_USER', 'group6'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', '34.182.64.16'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': {
+            'connect_timeout': 5,
+        },
+    }
+}
 
 
 

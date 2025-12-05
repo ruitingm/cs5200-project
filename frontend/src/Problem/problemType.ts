@@ -1,5 +1,5 @@
 /**
- * - Defines types and constant lists for problems in the app 
+ * - Defines types and constant lists for problems in the app
  * - Defines problemFilter type used for filtering UI
  */
 
