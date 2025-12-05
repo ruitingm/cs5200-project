@@ -1,16 +1,15 @@
 /**
- * - Displays a specific SQL problem and allows the user to write and submit a SQL solution  
- * - On submit, sends the code to backend via API; shows success or error feedback  
- * - After successful submission, shows whether test passed and reveals the official solution if available  
+ * - Displays a specific SQL problem and allows the user to write and submit a SQL solution
+ * - On submit, sends the code to backend via API; shows success or error feedback
+ * - After successful submission, shows whether test passed and reveals the official solution if available
  */
-// TODO
-// 1. Add solution
-import { Check, X, Undo2 } from "lucide-react";
-import { useState } from "react";
+import { Undo2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router";
 import type { RootState } from "../store/store";
-import { submitProblemApi } from "../api/submissions";
+import { fetchProblemSolutionApi } from "../api/solution";
+// import { submitProblemApi } from "../api/submissions";
 
 export default function ProblemEdit() {
   const { pId } = useParams();
@@ -18,50 +17,68 @@ export default function ProblemEdit() {
     (state: RootState) => state.problemReducer.problems
   );
   const problem = problems?.find((p) => Number(pId) === p.pId);
-  const solutions = useSelector(
-    (state: RootState) => state.solutionReducer.solutions
-  );
-  const solution = solutions?.find((s) => problem?.pSolutionId === s.sId);
-  const currentUser = useSelector(
-    (state: RootState) => state.userReducer.currentUser
-  );
-  console.log(solution);
-  const [submitted, setSubmitted] = useState(false);
-  const [passed, setPassed] = useState(false);
   const [solutionVisible, setSolutionVisible] = useState(false);
   const [code, setCode] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const handleSubmit = async () => {
-    if (!currentUser?.accountNumber || !pId) {
-      console.log("Missing account number or problem id");
+  // const solutions = useSelector(
+  //   (state: RootState) => state.solutionReducer.solutions
+  // );
+  // const solution = solutions?.find((s) => problem?.pSolutionId === s.sId);
+  const [solution, setSolution] = useState<{
+    sId: number;
+    pId: number;
+    sDescription: string;
+    success: boolean;
+  } | null>(null);
+  const fetchSolution = async (pId: number) => {
+    const response = await fetchProblemSolutionApi(pId);
+    if (!response.success) {
+      console.log("Failed to fetch solution");
       return;
     }
-
-    if (!code.trim()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    try {
-      await submitProblemApi(Number(pId), {
-        accountNumber: currentUser.accountNumber,
-        submission: code,
-      });
-
-      setSubmitted(true);
-      setPassed(true);
-      setSolutionVisible(true);
-    } catch (error) {
-      console.log("Failed to submit problem", error);
-      setSubmitError("Failed to submit answer. Try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSolution(response);
   };
+  useEffect(() => {
+    fetchSolution(Number(pId));
+  }, [pId]);
+  // const currentUser = useSelector(
+  // const currentUser = useSelector(
+  //   (state: RootState) => state.userReducer.currentUser
+  // );
+  // const [submitted, setSubmitted] = useState(false);
+  // const [passed, setPassed] = useState(false);
+
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // const handleSubmit = async () => {
+  //   if (!currentUser?.accountNumber || !pId) {
+  //     console.log("Missing account number or problem id");
+  //     return;
+  //   }
+
+  //   if (!code.trim()) {
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+  //   setSubmitError(null);
+
+  //   try {
+  //     await submitProblemApi(Number(pId), {
+  //       accountNumber: currentUser.accountNumber,
+  //       submission: code,
+  //     });
+
+  //     setSubmitted(true);
+  //     setPassed(true);
+  //     setSolutionVisible(true);
+  //   } catch (error) {
+  //     console.log("Failed to submit problem", error);
+  //     setSubmitError("Failed to submit answer. Try again.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   return (
     <div className="flex h-screen bg-stone-100 text-stone-800 overflow-hidden">
@@ -82,7 +99,7 @@ export default function ProblemEdit() {
             {problem?.pDescription}
           </pre>
         </div>
-        {submitError && (
+        {/* {submitError && (
           <div className="p-3 rounded-lg font-medium mb-4 bg-rose-100 text-rose-800 border border-rose-300">
             {submitError}
           </div>
@@ -108,7 +125,7 @@ export default function ProblemEdit() {
               </div>
             )}
           </div>
-        )}
+        )} */}
         {solutionVisible && (
           <div className="mt-4 border-t border-stone-300 pt-3">
             <h3 className="text-lg font-semibold text-stone-700 mb-2 ms-1">
@@ -134,11 +151,11 @@ export default function ProblemEdit() {
         </div>
         <div className="sticky bottom-0 bg-stone-200 py-3 flex justify-end mb-1">
           <button
-            onClick={handleSubmit}
+            onClick={() => setSolutionVisible(true)}
             className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50"
-            disabled={isSubmitting}
+            disabled={solutionVisible}
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            Show Solution
           </button>
         </div>
       </div>
