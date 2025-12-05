@@ -1,7 +1,7 @@
 /**
- * Represents one problem in the problem list  
+ * Represents one problem in the problem list
  * - Renders a link to the problem’s detail/edit page
- * - Shows problem ID, title, difficulty, and a “solved” checkmark icon  
+ * - Shows problem ID, title, difficulty, and a “solved” checkmark icon
  */
 
 export interface ProblemItemProps {
@@ -10,7 +10,7 @@ export interface ProblemItemProps {
   difficultyTag: ProblemDifficultyTag;
   conceptTags?: string[];
   solved?: boolean;
-};
+}
 
 import { Check } from "lucide-react";
 import { Link } from "react-router";

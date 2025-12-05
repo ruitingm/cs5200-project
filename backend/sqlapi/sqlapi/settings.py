@@ -132,7 +132,6 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 #     }
 # }
 
-# Hazel's local database configuration (currently active)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
