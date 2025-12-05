@@ -8,10 +8,11 @@ import {
   type ProblemCategory,
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
-import { addSolution } from "../Problem/solutionSlice";
+
 import { updateProblemApi } from "../api/problem";
 import { publishProblemApi } from "../api/problem";
 import { fetchTagsApi } from "../api/tags";
+import { addSolutionApi } from "../api/solution";
 
 export default function ProblemCreation({
   pId,
@@ -99,16 +100,9 @@ export default function ProblemCreation({
 
     return match.tag_id;
   };
-
   const handleSave = async () => {
     try {
-      const tempSolutionId = Math.floor(Math.random() * 1000000);
-      dispatch(
-        addSolution({
-          sId: tempSolutionId,
-          sDescription: solution,
-        })
-      );
+      await addSolutionApi({ pId, sDescription: solution });
 
       const tagId = computeTagId();
       if (!tagId) {
@@ -120,7 +114,6 @@ export default function ProblemCreation({
         title: title.trim(),
         description: description.trim(),
         tagId: tagId,
-        solutionId: tempSolutionId,
       };
       console.log("Update payload:", payload);
 
@@ -134,7 +127,7 @@ export default function ProblemCreation({
           pDescription: description,
           difficultyTag: difficulty,
           conceptTag: concepts,
-          pSolutionId: tempSolutionId,
+          pSolutionId: undefined,
           reviewed: true,
         })
       );

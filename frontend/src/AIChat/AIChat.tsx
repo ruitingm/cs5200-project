@@ -1,8 +1,8 @@
 /**
- * Chat interface to use LLM assistant  
- * - Maintains message history in state and shows chat UI 
- * - Supports a route for creating new problems via LLM ("/llm-problem-creation")  
- * 
+ * Chat interface to use LLM assistant
+ * - Maintains message history in state and shows chat UI
+ * - Supports a route for creating new problems via LLM ("/llm-problem-creation")
+ *
  * TODO:
  * Right now uses local component state. Need to connect this to backend and LLM
  */
@@ -12,7 +12,6 @@ import { useNavigate, Routes, Route } from "react-router-dom";
 import { Plus, Loader2 } from "lucide-react";
 import LLMProblemCreation from "./LLMProblemCreation";
 import { callNL2SQL, formatQueryResult } from "../api/chat";
-
 
 export default function AIChat() {
   const navigate = useNavigate();
@@ -56,7 +55,7 @@ Write a SQL query to list all customers and their total amount spent, including 
 
     const userQuestion = input.trim();
     const userMessage = { sender: "user", text: userQuestion };
-    
+
     // 添加用户消息
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -66,16 +65,17 @@ Write a SQL query to list all customers and their total amount spent, including 
       // 调用NL2SQL API
       const response = await callNL2SQL(userQuestion);
       const formattedResult = formatQueryResult(response);
-      
+
       // 添加AI响应
       const aiMessage = { sender: "ai", text: formattedResult };
       setMessages((prev) => [...prev, aiMessage]);
-      
     } catch (error) {
       // 处理错误
       const errorMessage = {
         sender: "ai",
-        text: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease try again or contact support if the problem persists.`
+        text: `Sorry, I encountered an error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }\n\nPlease try again or contact support if the problem persists.`,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -122,7 +122,9 @@ Write a SQL query to list all customers and their total amount spent, including 
       <div className="border-t border-gray-300 p-4 bg-stone-50 flex items-center rounded-bl-xl rounded-br-xl">
         <input
           type="text"
-          placeholder={isLoading ? "Processing..." : "Ask a question about the database..."}
+          placeholder={
+            isLoading ? "Processing..." : "Ask a question about the database..."
+          }
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}

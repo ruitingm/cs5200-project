@@ -1,3 +1,4 @@
+import json
 from django.db import connection
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -21,6 +22,51 @@ def get_solution(request, pId):
                     'error': 'Solution not found',
                     'success': False
                 })
+    except Exception as e:
+        return Response({
+            'error': str(e),
+            'success': False
+        })
+
+@api_view(['POST'])
+def add_solution(request):
+    data = json.loads(request.body)
+    pId = data.get('pId')
+    sDescription = data.get('sDescription')
+    if not pId or not sDescription:
+        return Response({
+            'error': 'Missing required fields',
+            'success': False
+        }, status=400)
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO SOLUTION (Problem_ID, Solution_Description) VALUES (%s, %s)", [pId, sDescription])
+            return Response({
+                'success': True
+            })
+    except Exception as e:
+        return Response({
+            'error': str(e),
+            'success': False
+        })
+
+@api_view(['PUT'])
+def update_solution(request, pid):
+    data = json.loads(request.body)
+    sDescription = data.get('sDescription')
+    if not sDescription:
+        return Response({
+            'error': 'Missing required fields',
+            'success': False
+        }, status=400)
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE SOLUTION SET Solution_Description = %s WHERE Problem_ID = %s", [sDescription, pid])
+            return Response({
+                'success': True
+            })
     except Exception as e:
         return Response({
             'error': str(e),

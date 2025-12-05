@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { updateProblem } from "../Problem/problemSlice";
@@ -9,6 +9,11 @@ import {
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
 import { updateProblemApi } from "../api/problem";
+import {
+  fetchProblemSolutionApi,
+  updateSolutionApi,
+  addSolutionApi,
+} from "../api/solution";
 
 export default function ProblemEditor({
   pId,
@@ -43,13 +48,21 @@ export default function ProblemEditor({
   const [concepts, setConcepts] = useState<ProblemCategory[]>([
     ...problem.conceptTag,
   ]);
-  const solutions = useSelector(
-    (state: RootState) => state.solutionReducer.solutions
-  );
-  const pSolution = solutions?.find((s) => s.sId === problem.pSolutionId);
-  const [solution, setSolution] = useState<string>(
-    pSolution ? pSolution.sDescription : ""
-  );
+  const [solution, setSolution] = useState("");
+  const [solutionId, setSolutionId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadSolution = async () => {
+      try {
+        const result = await fetchProblemSolutionApi(pId);
+        setSolution(result.sDescription);
+        setSolutionId(result.sId);
+      } catch (error) {
+        console.log("No existing solution found or failed to load.");
+      }
+    };
+    loadSolution();
+  }, [pId]);
   const toggleConcept = (tag: ProblemCategory) => {
     setConcepts((prev) =>
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
@@ -65,11 +78,20 @@ export default function ProblemEditor({
 
   const handleSave = async () => {
     try {
+      // 1. Update Problem fields
       await updateProblemApi(pId, {
         title,
         description,
         tagId: tagId,
       });
+
+      // 2. Update or Add Solution
+      if (solutionId) {
+        await updateSolutionApi(pId, { sDescription: solution });
+      } else {
+        // If no solution exists yet, create one
+        await addSolutionApi({ pId, sDescription: solution });
+      }
 
       dispatch(
         updateProblem({

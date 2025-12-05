@@ -39,7 +39,6 @@ export async function fetchReviewedProblemsApi(reviewed: boolean = false) {
   if (!response.ok) {
     throw new Error("Failed to fetch reviewed problems");
   }
-
   return await response.json();
 }
 
@@ -48,11 +47,16 @@ export async function addProblemApi(data: {
   problem_description: string;
   tag_id: number;
 }) {
-  const res = await fetch("/problems/add/", {
+  const res = await fetch(`${API_BASE_URL}/problems/add/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
+
+  if (!res.ok) {
+    throw new Error("Failed to add problem");
+  }
+
   return res.json();
 }
 

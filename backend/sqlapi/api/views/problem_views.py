@@ -179,40 +179,7 @@ def delete_problem(request, pid):
 
     return JsonResponse({"success": True, "deleted_id": pid})
 
-## eid problems
-# @api_view(["PUT"])
-# def update_problem(request, pid):
-#     """
-#     Update a problem by Problem_ID
-#     """
-#     data = json.loads(request.body)
 
-#     title = data.get("title")
-#     description = data.get("description")
-#     tag_id = data.get("tagId")
-
-#     if not title or not description or not tag_id:
-#         return JsonResponse({"error": "Missing fields"}, status=400)
-
-#     with connection.cursor() as cursor:
-#         cursor.execute("""
-#             UPDATE PROBLEM
-#             SET Problem_title = %s,
-#                 Problem_description = %s,
-#                 Tag_ID = %s
-#             WHERE Problem_ID = %s
-#         """, [title, description, tag_id, pid])
-
-#         updated = cursor.rowcount
-#     print("==== UPDATE PAYLOAD ====")
-#     print("title:", title)
-#     print("description:", description)
-#     print("tag_id:", tag_id)
-#     if updated == 0:
-#         return JsonResponse({"error": "Problem not found"}, status=404)
-        
-
-#     return JsonResponse({"success": True, "updated_id": pid})
 @api_view(["PUT"])
 def update_problem(request, pid):
     """
