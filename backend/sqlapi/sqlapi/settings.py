@@ -80,19 +80,6 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#      'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'sql_study_room',
-#         'USER': 'BeautySharon',
-#         'PASSWORD': 'StrongPwd__123!',
-#         'HOST': '34.168.79.184',
-#         'PORT': '3306',
-#         'OPTIONS': {
-#             'connect_timeout': 5, 
-#         },
-#     }
-# }
 # Sharon's database configuration
 # DATABASES = {
 #     'default': {
@@ -124,7 +111,7 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'week1',
+#         'NAME': 'sql_study_room',
 #         'USER': 'root',
 #         'PASSWORD': 'susie0114',
 #         'HOST': '127.0.0.1',
@@ -132,7 +119,7 @@ WSGI_APPLICATION = 'sqlapi.wsgi.application'
 #     }
 # }
 
-# Hazel's local database configuration (currently active)
+# GCP database configuration (currently active)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
