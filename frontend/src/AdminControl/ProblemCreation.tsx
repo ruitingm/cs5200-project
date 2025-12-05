@@ -102,6 +102,10 @@ export default function ProblemCreation({
   };
   const handleSave = async () => {
     try {
+      if (!solution.trim()) {
+        alert("Please provide a solution description.");
+        return;
+      }
       await addSolutionApi({ pId, sDescription: solution });
 
       const tagId = computeTagId();

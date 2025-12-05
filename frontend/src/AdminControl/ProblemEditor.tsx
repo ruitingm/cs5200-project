@@ -63,6 +63,7 @@ export default function ProblemEditor({
     };
     loadSolution();
   }, [pId]);
+
   const toggleConcept = (tag: ProblemCategory) => {
     setConcepts((prev) =>
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
@@ -78,6 +79,11 @@ export default function ProblemEditor({
 
   const handleSave = async () => {
     try {
+      if (!solution.trim()) {
+        alert("Please provide a solution description.");
+        return;
+      }
+
       // 1. Update Problem fields
       await updateProblemApi(pId, {
         title,
