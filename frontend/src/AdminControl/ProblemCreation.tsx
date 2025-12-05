@@ -31,6 +31,7 @@ import {
 import { addSolution } from "../Problem/solutionSlice";
 import { updateProblemApi } from "../api/problem";
 import { publishProblemApi } from "../api/problem";
+import { fetchTagsApi } from "../api/tags";
 
 export default function ProblemCreation({
   pId,
@@ -39,11 +40,38 @@ export default function ProblemCreation({
   pId: number;
   onBack: () => void;
 }) {
+  const [tags, setTags] = react.useState<
+    {
+      tag_id: number;
+      difficulty: string;
+      concept: string;
+    }[]
+  >([]);
+  react.useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const result = await fetchTagsApi(); // <-- 你已有的 API
+        setTags(result);
+      } catch (error) {
+        console.error("Failed to load tags", error);
+      }
+    };
+
+    loadTags();
+  }, []);
   const dispatch = useDispatch();
   const problems = useSelector(
     (state: RootState) => state.problemReducer.problems
   );
   const problem = problems?.find((p) => p.pId === pId);
+  // const TAG_MAP: Record<string, number> = {
+  //   "Beginner|JOIN": 1,
+  //   "Beginner|GROUP BY": 2,
+  //   "Intermediate|JOIN": 3,
+  //   "Intermediate|GROUP BY": 4,
+  //   "Advanced|JOIN": 5,
+  //   "Advanced|GROUP BY": 6,
+  // };
   if (!problem) {
     return (
       <div className="text-stone-700 p-6">
@@ -72,9 +100,36 @@ export default function ProblemCreation({
       prev.includes(tag) ? prev.filter((c) => c !== tag) : [...prev, tag]
     );
   };
+  const computeTagId = () => {
+    if (tags.length === 0) {
+      console.warn("Tags have not loaded yet!");
+      return null;
+    }
+
+    if (!difficulty || concepts.length === 0) {
+      console.warn("Difficulty or concept not selected.");
+      return null;
+    }
+
+    const selectedConcept = concepts[0]; // 单选或多选取第一个概念
+
+    const match = tags.find(
+      (t) =>
+        t.difficulty.toLowerCase() === difficulty.toLowerCase() &&
+        t.concept.toLowerCase() === selectedConcept.toLowerCase()
+    );
+
+    if (!match) {
+      console.warn("No matching tag found for:", difficulty, selectedConcept);
+      return null;
+    }
+
+    return match.tag_id;
+  };
+
   const handleSave = async () => {
     try {
-      // 1. 先保存 Solution
+      // 1. 先保存 Solution 到 Redux
       const tempSolutionId = Math.floor(Math.random() * 1000000);
       dispatch(
         addSolution({
@@ -83,26 +138,35 @@ export default function ProblemCreation({
         })
       );
 
-      // 2. 更新数据库中的 Problem (标题、描述、difficulty、concept)
-      await updateProblemApi(pId, {
-        pTitle: title,
-        pDescription: description,
-        difficultyTag: difficulty,
-        conceptTag: concepts.join(","),
-        solutionId: tempSolutionId,
-      });
+      // 2. 计算 tagId
+      const tagId = computeTagId();
+      if (!tagId) {
+        alert("Cannot determine Tag ID. Check difficulty & concept.");
+        return;
+      }
 
-      // 3. 调用 publish API，把 reviewed=1 写进数据库
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        tagId: tagId,
+        solutionId: tempSolutionId,
+      };
+      console.log("Update payload:", payload);
+
+      // 3. 调用更新 Problem 的 API（后端的 /problems/<pid>/update/）
+      await updateProblemApi(pId, payload);
+
+      // 4. 调用 publish API，把 Review_status 置为 1
       await publishProblemApi(pId);
 
-      // 4. 更新 Redux 前端状态
+      // 5. 更新前端 Redux 状态
       dispatch(
         updateProblem({
           ...problem,
           pTitle: title,
+          pDescription: description,
           difficultyTag: difficulty,
           conceptTag: concepts,
-          pDescription: description,
           pSolutionId: tempSolutionId,
           reviewed: true,
         })

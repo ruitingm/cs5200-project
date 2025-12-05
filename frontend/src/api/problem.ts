@@ -43,6 +43,7 @@ export async function fetchReviewedProblemsApi(reviewed: boolean = false) {
   return await response.json();
 }
 export async function addProblemApi(data: {
+  problem_title: string;
   problem_description: string;
   tag_id: number;
 }) {
@@ -63,17 +64,16 @@ export async function deleteProblemApi(problemId: number) {
   return res.json();
 }
 
-export async function updateProblemApi(problemId: number, payload: any) {
-  const res = await fetch(`${API_BASE_URL}/problems/${problemId}/update/`, {
+export async function updateProblemApi(pId: number, data: any) {
+  const res = await fetch(`${API_BASE_URL}/problems/${pId}/update/`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
 
   if (!res.ok) {
-    console.error("Update failed", await res.text());
+    const errJson = await res.json().catch(() => ({}));
+    console.error("Update failed", errJson);
     throw new Error("Failed to update problem");
   }
 
