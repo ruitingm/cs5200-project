@@ -1,12 +1,3 @@
-/**
- * UI for users to sign up (first name, last name, email, password)
- * - On “Sign up” click, stores user data in Redux and navigates to main page (currently mock flow)
- *
- * TODO:
- * Need backend signup API call
- * Check user input values, set error messge for invalid inputs
- */
-
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";

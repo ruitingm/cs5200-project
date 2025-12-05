@@ -1,10 +1,3 @@
-/**
- * - Admin UserPanel component to view, search, and delete users
- * - Fetches users from backend API on mount
- * - Allows searching users by first name, last name, or email
- * - Opens DeleteModal to confirm user deletion
- */
-
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";

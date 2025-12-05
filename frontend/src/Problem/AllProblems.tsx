@@ -13,17 +13,14 @@ export default function AllProblems() {
   const dispatch = useDispatch<AppDispatch>();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Redux data
   const { problems, loading, error } = useSelector(
     (state: RootState) => state.problemReducer
   );
 
-  // Filter state - separate selected (UI) from applied (backend)
   const [selectedCategory, setSelectedCategory] = useState<ProblemCategory>();
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>();
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  // Tags data from backend: { tag_id, difficulty, concept }
   const [tags, setTags] = useState<
     {
       tag_id: number;
@@ -34,13 +31,11 @@ export default function AllProblems() {
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
-  // Filter results & state
   const [filteredProblems, setFilteredProblems] = useState<Problem[]>([]);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [filterMessage, setFilterMessage] = useState("");
   const [filtering, setFiltering] = useState(false);
 
-  // Load problems and tags on page load
   useEffect(() => {
     dispatch(fetchProblems());
 
@@ -64,13 +59,6 @@ export default function AllProblems() {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  /**
-   * Normalize different API responses into a consistent Problem shape
-   * Handles:
-   * - pId vs problem_id
-   * - pTitle vs title
-   * - pDescription vs description
-   */
   const normalizeProblem = (p: any): Problem => ({
     pId: p.pId ?? p.problem_id,
     pTitle: p.pTitle ?? p.title ?? "Untitled Problem",
@@ -81,7 +69,6 @@ export default function AllProblems() {
     reviewed: p.reviewed ?? true,
   });
 
-  // Apply filters: find matching tag(s) and fetch filtered problems
   const applyFilters = async () => {
     if (!selectedDifficulty && !selectedCategory) {
       return;
@@ -114,7 +101,6 @@ export default function AllProblems() {
         return;
       }
 
-      // Fetch problems for all matching tags
       const allProblems: Problem[] = [];
 
       for (const tag of matchingTags) {
@@ -123,7 +109,6 @@ export default function AllProblems() {
         allProblems.push(...normalized);
       }
 
-      // Remove duplicates based on pId
       const uniqueProblems = Array.from(
         new Map(allProblems.map((p) => [p.pId, p])).values()
       );
@@ -141,7 +126,6 @@ export default function AllProblems() {
     }
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedCategory(undefined);
     setSelectedDifficulty(undefined);
@@ -150,14 +134,10 @@ export default function AllProblems() {
     setFilterMessage("");
   };
 
-  // Determine which problems to display:
-  // - If filtersApplied: always use filteredProblems (even if empty)
-  // - Else: use all problems from Redux (normalized)
   const baseProblems: Problem[] = filtersApplied
     ? filteredProblems
     : problems.map(normalizeProblem);
 
-  // Apply search filter client-side
   const searchFilteredProblems = baseProblems.filter((p) => {
     const key = searchKeyword.trim().toLowerCase();
     if (!key) return true;
@@ -174,7 +154,6 @@ export default function AllProblems() {
 
   return (
     <div className="flex flex-col h-full w-full bg-stone-100 p-4 space-y-5">
-      {/* ===================== CATEGORY FILTER ===================== */}
       <div className="relative flex items-center mb-4 felx-col">
         <div
           ref={scrollRef}
@@ -207,7 +186,6 @@ export default function AllProblems() {
         </button>
       </div>
 
-      {/* ===================== DIFFICULTY FILTER ===================== */}
       <div className="flex gap-3 items-center">
         {["Easy", "Medium", "Hard"].map((diff) => (
           <button
@@ -227,7 +205,6 @@ export default function AllProblems() {
         ))}
       </div>
 
-      {/* ===================== TAG LOADING / ERROR / FILTER STATUS ===================== */}
       {tagsLoading && (
         <div className="text-sm text-stone-600">Loading tags…</div>
       )}
@@ -238,7 +215,6 @@ export default function AllProblems() {
         <div className="text-sm text-stone-600">{filterMessage}</div>
       )}
 
-      {/* ===================== FILTER ACTION BUTTONS ===================== */}
       <div className="flex space-x-4 justify-end">
         <button
           onClick={applyFilters}
@@ -255,7 +231,6 @@ export default function AllProblems() {
         </button>
       </div>
 
-      {/* ===================== SEARCH FILTER ===================== */}
       <div className="flex gap-2 bg-white px-3 py-1 rounded-3xl shadow">
         <input
           type="text"
@@ -272,7 +247,6 @@ export default function AllProblems() {
         </Link>
       </div>
 
-      {/* ===================== PROBLEM LIST ===================== */}
       <div className="flex-1 overflow-y-auto rounded-lg">
         {searchFilteredProblems.length === 0 ? (
           <div className="p-6 text-stone-500 text-center">

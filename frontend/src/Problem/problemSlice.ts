@@ -76,7 +76,7 @@ const problemSlice = createSlice({
       })
       .addCase(fetchProblems.fulfilled, (state, action) => {
         state.loading = false;
-        state.problems = action.payload; // <-- 数据塞进 Redux!
+        state.problems = action.payload;
       })
       .addCase(fetchProblems.rejected, (state) => {
         state.loading = false;

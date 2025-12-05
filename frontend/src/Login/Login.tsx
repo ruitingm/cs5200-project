@@ -1,12 +1,3 @@
-/**
- * UI for users to log in with email & password
- * - Calls backend via loginApi and, if successful stores user info in Redux
- * - Redirects user to main page on successful login; shows error messages on failure
- *
- * TODO:
- * Connect to backend databae for login credential check
- */
-
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { setCurrentUser } from "../Profile/userSlice";
@@ -35,14 +26,13 @@ export default function Login() {
       dispatch(
         setCurrentUser({
           email: result.email,
-          firstName: result.firstName, // ensure loginApi has turned to camelCase
+          firstName: result.firstName,
           lastName: result.lastName,
           accountNumber: result.accountNumber,
-          isStudent: result.isStudent, // boolean
-          isAdmin: result.isAdmin, // boolean
+          isStudent: result.isStudent,
+          isAdmin: result.isAdmin,
         })
       );
-
       navigate("/main");
     } catch (err) {
       setError("Server error. Try again.");
@@ -89,15 +79,6 @@ export default function Login() {
           {error && (
             <div className="text-rose-700 flex mx-2 text-sm">{error}</div>
           )}
-          {/* <button
-            className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogin(email, password);
-            }}
-          >
-            Log in
-          </button> */}
           <button
             className="w-full bg-sky-600 py-2 rounded mt-4 hover:bg-sky-700 text-white text-lg font-semibold"
             onClick={(e) => {

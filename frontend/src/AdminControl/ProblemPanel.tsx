@@ -1,14 +1,3 @@
-/**
- * Shows a list of problems filtered by review status All/Reviewed/Unreviewed
- * - Lets admin view, edit, or delete each problem
- * - Uses Redux store via useSelector to get current list of problems
- * - Includes DeleteModal to confirm deletions
- * - Calls onCreate or onEdit to trigger creation or edit
- *
- * TODO:
- * Backend integration
- */
-
 import { useState, useEffect } from "react";
 import { Eye, PencilLine, Trash2 } from "lucide-react";
 import type { problemFilter } from "../Problem/problemType";

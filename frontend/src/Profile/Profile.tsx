@@ -1,20 +1,8 @@
-/**
- * Displays the logged-in user’s profile info
- * - Fetches full profile data from backend on mount
- * - Allows user to edit first and last name and save changes via backend API
- * - Provides a logout button to clear user state and navigate to login page
- *
- * TODO:
- * Validate user input before saving profile
- */
-
 import dayjs from "dayjs";
 import { BellDot } from "lucide-react";
 import { useEffect, useState } from "react";
-// import userData from "../Database/user.json";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser } from "./userSlice";
-// import { setCurrentUser, updateFirstName, updateLastName } from "./userSlice";
 import { useNavigate } from "react-router";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { fetchProfileApi, updateProfileApi } from "../api/profile";
@@ -23,17 +11,12 @@ export default function Profile() {
   dayjs.extend(customParseFormat);
   const { currentUser } = useSelector((state: any) => state.userReducer);
   const [profileData, setProfileData] = useState<any>(currentUser);
-  // Manually add user
   const [firstName, setFirstName] = useState(currentUser?.firstName || "");
   const [lastName, setLastName] = useState(currentUser?.lastName || "");
   const profilePicture = "/images/default_profile.jpg";
-  // const email = currentUser?.email || userData[0].email;
   const email = profileData?.email || currentUser?.email || "";
-  // const registerDate = currentUser?.registerDate || userData[0].registerDate;
   const registerDate = profileData?.registerDate || currentUser?.registerDate;
-  // const isStudent = currentUser?.isStudent || userData[0].isStudent;
   const isStudent = profileData?.isStudent ?? currentUser?.isStudent ?? false;
-  //
   const today = dayjs().format("dddd, MMMM D, YYYY");
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDispatch();

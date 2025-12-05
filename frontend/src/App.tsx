@@ -12,20 +12,12 @@
 
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import API_BASE_URL from "./api/config";
 import Login from "./Login/Login";
 import Signup from "./Login/Signup";
 import MainPage from "./MainPage/MainPage";
 import { useAppDispatch } from "./store/hooks";
 import { useEffect, useState } from "react";
 import { fetchProblems } from "./Problem/problemSlice";
-// import { setProblems } from "./Problem/problemSlice";
-// import { parseProblems } from "./Problem/problemParser";
-// import { setSolutions } from "./Problem/solutionSlice";
-// import solutionJson from "./Database/solution.json";
-// import { setUsers } from "./Profile/userSlice";
-// import userJson from "./Database/user.json";
-
 function App() {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(true);

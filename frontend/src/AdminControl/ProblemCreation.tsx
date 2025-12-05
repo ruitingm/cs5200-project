@@ -1,22 +1,3 @@
-/**
- * Lets admin review and publish a new or edited SQL problem
- * - Loads the problem from Redux store by pId
- * - Renders a form letting the admin set or edit different fields
- * - Maintains internal form state using React’s useState hook
- * - On “Publish” button click:
- *  > Creates a temporary solution ID
- *  > Dispatches the addSolution action to Redux
- *  > Creates an updated Problem object
- *  > Dispatches the updateProblem action to Redux
- *  > Calls onBack() to go back to the problem list view
- * - Renders the form inside a scrollable panel
- *
- * TODO:
- * Need backend API calls, right now it only updates Redux store.
- * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
- * Need loading/error message if backend call fails.
- */
-
 import * as react from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
@@ -24,7 +5,6 @@ import { updateProblem } from "../Problem/problemSlice";
 import {
   problemCategories,
   problemDifficulties,
-  type Problem,
   type ProblemCategory,
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
@@ -50,7 +30,7 @@ export default function ProblemCreation({
   react.useEffect(() => {
     const loadTags = async () => {
       try {
-        const result = await fetchTagsApi(); // <-- 你已有的 API
+        const result = await fetchTagsApi();
         setTags(result);
       } catch (error) {
         console.error("Failed to load tags", error);
@@ -64,14 +44,7 @@ export default function ProblemCreation({
     (state: RootState) => state.problemReducer.problems
   );
   const problem = problems?.find((p) => p.pId === pId);
-  // const TAG_MAP: Record<string, number> = {
-  //   "Beginner|JOIN": 1,
-  //   "Beginner|GROUP BY": 2,
-  //   "Intermediate|JOIN": 3,
-  //   "Intermediate|GROUP BY": 4,
-  //   "Advanced|JOIN": 5,
-  //   "Advanced|GROUP BY": 6,
-  // };
+
   if (!problem) {
     return (
       <div className="text-stone-700 p-6">
@@ -111,7 +84,7 @@ export default function ProblemCreation({
       return null;
     }
 
-    const selectedConcept = concepts[0]; // 单选或多选取第一个概念
+    const selectedConcept = concepts[0];
 
     const match = tags.find(
       (t) =>
@@ -129,7 +102,6 @@ export default function ProblemCreation({
 
   const handleSave = async () => {
     try {
-      // 1. 先保存 Solution 到 Redux
       const tempSolutionId = Math.floor(Math.random() * 1000000);
       dispatch(
         addSolution({
@@ -138,7 +110,6 @@ export default function ProblemCreation({
         })
       );
 
-      // 2. 计算 tagId
       const tagId = computeTagId();
       if (!tagId) {
         alert("Cannot determine Tag ID. Check difficulty & concept.");
@@ -153,13 +124,9 @@ export default function ProblemCreation({
       };
       console.log("Update payload:", payload);
 
-      // 3. 调用更新 Problem 的 API（后端的 /problems/<pid>/update/）
       await updateProblemApi(pId, payload);
-
-      // 4. 调用 publish API，把 Review_status 置为 1
       await publishProblemApi(pId);
 
-      // 5. 更新前端 Redux 状态
       dispatch(
         updateProblem({
           ...problem,

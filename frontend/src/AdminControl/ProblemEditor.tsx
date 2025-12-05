@@ -1,14 +1,3 @@
-/**
- * Lets admin edit an existing SQL problem
- * - Loads the problem from Redux store by pId
- * - Uses local state (useState) for form fields
- * - On “Save” click, dispatches updates to store and returns to the list view
- *
- * TODO:
- * Need to connect to bakcend, right now only updates Redux store.
- * Creates a random temporary problem ID - when connected to backend, replace with the real ID returned by the server.
- */
-
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
@@ -16,11 +5,9 @@ import { updateProblem } from "../Problem/problemSlice";
 import {
   problemCategories,
   problemDifficulties,
-  type Problem,
   type ProblemCategory,
   type ProblemDifficultyTag,
 } from "../Problem/problemType";
-import { addSolution } from "../Problem/solutionSlice";
 import { updateProblemApi } from "../api/problem";
 
 export default function ProblemEditor({
@@ -78,20 +65,18 @@ export default function ProblemEditor({
 
   const handleSave = async () => {
     try {
-      // 1. 后端 PUT API — 发送 tagId（来自 difficulty）
       await updateProblemApi(pId, {
         title,
         description,
-        tagId: tagId, // ⭐ 这是发给后端的字段
+        tagId: tagId,
       });
 
-      // 2. Redux 本地更新 — 用 difficultyTag（前端字段名）
       dispatch(
         updateProblem({
           ...problem,
           pTitle: title,
           pDescription: description,
-          difficultyTag: difficulty, // ⭐ 注意这里
+          difficultyTag: difficulty,
           reviewed: true,
         })
       );

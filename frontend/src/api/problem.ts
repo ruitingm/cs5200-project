@@ -42,6 +42,7 @@ export async function fetchReviewedProblemsApi(reviewed: boolean = false) {
 
   return await response.json();
 }
+
 export async function addProblemApi(data: {
   problem_title: string;
   problem_description: string;
@@ -79,6 +80,7 @@ export async function updateProblemApi(pId: number, data: any) {
 
   return res.json();
 }
+
 export async function publishProblemApi(id: number) {
   const res = await fetch(`${API_BASE_URL}/problems/${id}/publish/`, {
     method: "POST",

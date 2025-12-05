@@ -1,10 +1,3 @@
-/**
- * Sidebar navigation menu
- * - Shows different links (Problems, Chat, Reports, Profile, Settings)
- * - Admin link visible only to admin users
- * - Displays current user name and role at bottom of sidebar
- */
-
 import {
   ScrollText,
   MessageCircleMore,
